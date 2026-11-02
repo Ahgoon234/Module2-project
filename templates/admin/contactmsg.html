@@ -1,0 +1,157 @@
+{% extends 'admin/components/base.html' %}
+
+{% load static %}
+
+{% block body %}
+
+<main class="admin-content" id="adminContent">
+    <section class="dashboard-card dashboard-card--table">
+        <div class="dashboard-card-header">
+            <h3 class="dashboard-card-title">Contact Messages</h3>
+        </div>
+
+        <!-- Search Form -->
+        <form method="get" action="{% url 'contactmsg_list' %}" class="car-filter-search">
+
+            <input type="search" name="search" placeholder="Search Sender's name..." value="{{ request.GET.search|default:'' }}">
+
+            <button type="submit" class="car-filter-submit">
+                <i class="fas fa-search"></i> Search
+            </button>
+            {% if request.GET.search %}
+            <a href="{% url 'contactmsg_list' %}" class="car-filter-clear">
+                Clear
+            </a>
+            {% endif %}
+        </form>
+
+        <div class="table-responsive">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Sender Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Date/Time</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for msg in contactmsgs %}
+                    <tr data-name="{{ msg.name }}" data-email="{{ msg.email }}" data-phone="{{ msg.phone }}"
+                        data-message="{{ msg.message }}" data-created-at="{{ msg.created_at }}"
+                        data-status="{% if msg.is_read %}Read{% else %}Unread{% endif %}">
+                        <td data-label="Sender Name">{{ msg.name }}</td>
+                        <td data-label="Email">{{ msg.email }}</td>
+                        <td data-label="Phone">{{ msg.phone }}</td>
+                        <td data-label="Date/Time">{{ msg.created_at }}</td>
+                        <td data-label="Status">
+                            {% if msg.is_read %}
+                            <span class="status-badge status-badge--read">Read</span>
+                            {% else %}
+                            <span class="status-badge status-badge--unread">Unread</span>
+                            {% endif %}
+                        </td>
+                        <td data-label="Actions">
+                            <div class="table-actions">
+                                <a href="#" class="table-action-btn" aria-label="View" data-admin-action="view"
+                                    data-admin-module="contact"><i class="fa-solid fa-eye" aria-hidden="true"></i></a>
+
+                                <form method="post" action="{% url 'contactmsg_click' msg.id %}"
+                                    class="contact-read-form">
+                                    {% csrf_token %}
+
+                                    {% if perms.lore.change_contactmsgmodel %}
+                                    <button type="submit" class="table-action-btn contact-read-toggle"
+                                        aria-label="{% if msg.is_read %}Mark as unread{% else %}Mark as read{% endif %}"
+                                        title="{% if msg.is_read %}Mark as unread{% else %}Mark as read{% endif %}">
+
+                                        {% if msg.is_read %}
+                                        <i class="fa-solid fa-rotate-left" aria-hidden="true"></i>
+                                        {% else %}
+                                        <i class="fa-solid fa-check" aria-hidden="true"></i>
+                                        {% endif %}
+
+                                    </button>
+                                    {% endif %}
+                                </form>
+
+                                {% if perms.lore.delete_contactmsgmodel %}
+                                <a href="{% url 'contactmsg_delete' msg.id %}"
+                                    class="table-action-btn table-action-btn--danger" data-delete-trigger
+                                    data-delete-name="{{ msg.name }}'s review" data-delete-id="{{ msg.id }}"
+                                    aria-label="Delete"><i class="fa-solid fa-trash"
+                                        aria-hidden="true"></i>
+                                </a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6">No contact messages found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+
+
+{% endblock body %}
+
+{% block form %}
+
+<div class="admin-modal" id="contactModal" data-admin-modal data-admin-module="contact" aria-hidden="true">
+    <div class="admin-modal-backdrop" data-modal-close></div>
+    <section class="admin-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="contactModalTitle">
+        <div class="admin-modal-header">
+            <div>
+                <span class="admin-modal-kicker">Message preview</span>
+                <h2 class="admin-modal-title" id="contactModalTitle" data-modal-title>View Contact Message</h2>
+                <p class="admin-modal-subtitle" data-modal-subtitle>Review this contact message in read-only mode.</p>
+            </div>
+            <button type="button" class="admin-modal-close" data-modal-close aria-label="Close contact message preview">
+                <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+            </button>
+        </div>
+        <form id="contactForm" class="admin-modal-form" data-modal-form novalidate>
+            <div class="admin-modal-body">
+                <div class="admin-form-grid">
+                    <div class="admin-field">
+                        <label for="contactName">Sender Name</label>
+                        <input type="text" id="contactName" name="name" readonly>
+                    </div>
+                    <div class="admin-field">
+                        <label for="contactEmail">Email</label>
+                        <input type="email" id="contactEmail" name="email" readonly>
+                    </div>
+                    <div class="admin-field">
+                        <label for="contactPhone">Phone</label>
+                        <input type="text" id="contactPhone" name="phone" readonly>
+                    </div>
+                    <div class="admin-field">
+                        <label for="contactCreatedAt">Date/Time</label>
+                        <input type="text" id="contactCreatedAt" name="created_at" readonly>
+                    </div>
+                    <div class="admin-field admin-field--full">
+                        <label for="contactMessage">Message</label>
+                        <textarea id="contactMessage" name="message" rows="7" readonly></textarea>
+                    </div>
+                    <div class="admin-field admin-field--full">
+                        <label for="contactStatus">Status</label>
+                        <input type="text" id="contactStatus" name="status" readonly>
+                    </div>
+                </div>
+            </div>
+            <div class="admin-modal-footer">
+                <span class="admin-modal-disclaimer text-danger">Please change the message status to 'Read' after reviewed the
+                    message and report the complain to admin.</span>
+            </div>
+        </form>
+    </section>
+</div>
+
+{% endblock form %}

@@ -1,0 +1,13 @@
+{% load static %}
+
+<div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="true">
+
+    {% if messages %}
+        {% for message in messages %}
+        <div class="django-message" data-message="{{ message }}" data-tag="{{ message.tags }}">
+            <span>{{ message }}</span>
+        </div>
+        {% endfor %}
+    {% endif %}
+
+</div>

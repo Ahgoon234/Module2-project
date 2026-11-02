@@ -1,0 +1,262 @@
+{% load static %}
+{% load humanize %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Profile</title>
+    <link rel="stylesheet" href="{% static 'admin/css/admin_pf.css' %}">
+    <link rel="stylesheet" href="{% static 'website/css/plugins.css' %}">
+    <link rel="stylesheet" href="{% static 'website/css/magnifying-popup.css' %}">
+    <link rel="stylesheet" href="{% static 'website/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'website/css/toast.css' %}">
+    <link rel="stylesheet" href="{% static 'website/css/rt-icon.css' %}">
+</head>
+
+<body>
+
+    <div class="loader-wrapper" id="preloader">
+        <div class="loader"></div>
+        <div class="loader-section section-left"></div>
+        <div class="loader-section section-right"></div>
+    </div>
+
+    <section class="admin-pf" id="admin-pf-root" data-admin-pf-root>
+        <div class="admin-pf-header">
+            <h2 class="admin-pf-title">Admin Profile
+                <p class="admin-pf-subtitle">Account details and registered users.</p>
+            </h2>
+
+            <a href="{% url 'dashboard' %}" class="admin-pf-dashboard">
+                <i class="fa-solid fa-gauge-high" style="color: #ff3600;"></i>
+                <span>Back to Dashboard</span>
+            </a>
+        </div>
+
+        <div class="admin-pf-layout">
+
+            <article class="admin-pf-card admin-pf-card--profile" aria-labelledby="admin-pf-profile-heading">
+                <div class="admin-pf-card-header">
+                    <h3 class="admin-pf-card-title" id="admin-pf-profile-heading">My Account</h3>
+                </div>
+
+                <div class="admin-pf-profile-body">
+                    <div class="admin-pf-photo-block">
+                        <form action="{% url 'admin_pf' %}" method="post" enctype="multipart/form-data"
+                            id="admin-pf-photo-form">
+                            {% csrf_token %}
+
+                            {% if profile.profile_image %}
+
+                            <img class="admin-pf-photo" id="admin-pf-photo" src="{{ profile.profile_image.url }}"
+                                alt="Profile Photo">
+
+                            {% else %}
+
+                            <img class="admin-pf-photo" id="admin-pf-photo"
+                                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Crect width='160' height='160' fill='%23FF3600'/%3E%3Ctext x='50%25' y='54%25' text-anchor='middle' fill='%23ffffff' font-family='Inter,Arial,sans-serif' font-size='46' font-weight='700'%3EAU%3C/text%3E%3C/svg%3E"
+                                alt="Admin profile photo" width="112" height="112">
+
+                            {% endif %}
+                            <button class="admin-pf-edit-photo" type="button" id="admin-pf-edit-photo">
+                                Edit Photo
+                            </button>
+                            <input class="admin-pf-file-input" id="admin-pf-photo-input" name="profile_image"
+                                type="file" accept="image/*" hidden>
+                            <p class="admin-pf-photo-feedback" id="admin-pf-photo-feedback" aria-live="polite"></p>
+                        </form>
+                    </div>
+
+                    <dl class="admin-pf-meta">
+                        <div class="admin-pf-meta-row">
+                            <dt>Username</dt>
+                            <dd id="admin-pf-username">{{ request.user.username }}</dd>
+                        </div>
+                        <div class="admin-pf-meta-row">
+                            <dt>Email</dt>
+                            <dd id="admin-pf-email">{{ request.user.email|default:'No email' }}</dd>
+                        </div>
+                        <div class="admin-pf-meta-row">
+                            <dt>Join date</dt>
+                            <dd id="admin-pf-joined">{{ request.user.date_joined|naturaltime}}</dd>
+                        </div>
+                        <div class="admin-pf-meta-row">
+                            <dt>Role</dt>
+                            <dd>
+                                {% if request.user.is_superuser %}
+                                <span class="admin-pf-badge admin-pf-badge--superuser">
+                                    Superuser
+                                </span>
+                                {% else %}
+                                <span class="admin-pf-badge admin-pf-badge--staff">
+                                    Staff
+                                </span>
+                                {% endif %}
+                            </dd>
+                        </div>
+                    </dl>
+                </div>
+
+                <div class="admin-pf-profile-actions">
+                    <button class="admin-pf-logout" type="button" id="admin-pf-logout">
+                        Logout
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                    </button>
+                </div>
+
+            </article>
+
+            <!-- Right: user table (sample rows for Live Server) -->
+            <article class="admin-pf-card admin-pf-card--users" aria-labelledby="admin-pf-users-heading">
+                <div class="admin-pf-card-header">
+                    <h3 class="admin-pf-card-title" id="admin-pf-users-heading">Users</h3>
+                    <span class="admin-pf-user-count">{{ user_count}} users</span>
+                </div>
+
+                <div class="admin-pf-table-scroll" id="admin-pf-table-scroll">
+                    <table class="admin-pf-table">
+                        <thead>
+                            <tr>
+                                <th scope="col">User</th>
+                                <th scope="col">Join Date</th>
+                                <th scope="col">Role</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in users %}
+                            <tr>
+                                <td>
+                                    {% if user.profile.profile_image %}
+
+                                    <img class="admin-pf-row-photo" src="{{ user.profile.profile_image.url }}"
+                                        alt="{{ user.username }}">
+
+                                    {% else %}
+
+                                    <div class="admin-pf-row-photo admin-pf-row-photo--default">
+                                        <i class="fa-solid fa-user"></i>
+                                    </div>
+
+                                    {% endif %}
+                                    <span class="admin-pf-user-name">{{ user.username }}</span>
+                                </td>
+                                <td>{{ user.date_joined|naturaltime }}</td>
+                                <td>
+                                    {% if user.is_superuser %}
+
+                                    <span class="admin-pf-badge admin-pf-badge--superuser">
+                                        Superuser
+                                    </span>
+
+                                    {% elif user.is_staff %}
+
+                                    <span class="admin-pf-badge admin-pf-badge--staff">
+                                        Staff
+                                    </span>
+
+                                    {% else %}
+
+                                    <span class="admin-pf-badge admin-pf-badge--user">
+                                        User
+                                    </span>
+
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if user.is_active %}
+
+                                    <span class="admin-pf-badge admin-pf-badge--active">
+                                        Active
+                                    </span>
+
+                                    {% else %}
+
+                                    <span class="admin-pf-badge admin-pf-badge--inactive">
+                                        Inactive
+                                    </span>
+
+                                    {% endif %}
+                                </td>
+
+                                <td>
+                                    {% if request.user.is_superuser and not user.is_superuser %}
+
+                                    <form action="{% url 'user_control' user.id %}" method="post">
+
+                                        {% csrf_token %}
+
+                                        {% if user.is_active %}
+
+                                        <button type="submit"
+                                            class="admin-pf-status-btn admin-pf-status-btn--deactivate">
+                                            Deactivate
+                                        </button>
+
+                                        {% else %}
+
+                                        <button type="submit" class="admin-pf-status-btn admin-pf-status-btn--activate">
+                                            Activate
+                                        </button>
+
+                                        {% endif %}
+
+                                    </form>
+
+                                    {% else %}
+
+                                    <span class="admin-pf-no-action">—</span>
+
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" style="text-align: center;">
+                                    No registered users found.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </article>
+        </div>
+
+        <!-- Static logout confirmation (not a Django logout) -->
+        <div class="admin-pf-modal" id="admin-pf-logout-modal" hidden>
+            <div class="admin-pf-modal-backdrop" data-admin-pf-close-modal></div>
+            <div class="admin-pf-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="admin-pf-logout-title">
+                <h4 class="admin-pf-modal-title" id="admin-pf-logout-title">Sign out?</h4>
+                <p class="admin-pf-modal-text">Please make sure all of your tasks are done before taking a break.</p>
+                <div class="admin-pf-modal-actions">
+                    <button class="admin-pf-dashboard" style="width: 50%;" type="button"
+                        data-admin-pf-close-modal>Stay</button>
+                    <form action="{% url 'logout_view' %}" method="post" style="width: 50%;">
+
+                        {% csrf_token %}
+
+                        <button class="admin-pf-logout" type="submit" style="width: 100%;" id="admin-pf-logout-confirm">
+
+                            Logout
+                            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+
+                        </button>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {% include 'website/components/toast.html' %}
+    <script src="{% static 'website/js/toast.js' %}"></script>
+    <script src="{% static 'admin/js/admin_pf.js' %}"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,92 @@
+{% extends 'website/components/base.html' %}
+
+{% load static %}
+
+{% block body %}
+
+<!-- header area end -->
+<!-- rts breadcrumb area start -->
+<div class="rts-breadcrumb-area blog-details jarallax">
+    <div class="container">
+        <div class="breadcrumb-area-wrapper">
+            <div class="left">
+                <p>AG-Enterprise's One out of many events</p>
+                <h1 class="title">{{ blog.title }}</h1>
+                <div class="author-area">
+                    <div class="image">
+                        <img src="{{ blog.thumbnail.url }}" alt="{{ blog.title }}">
+                    </div>
+                    <ul>
+                        <li>{{ blog.created_at }}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- rts breadcrumb area end -->
+<div class="rts-portfolio-area inner rts-section-gapTop">
+    <div class="container">
+        <div class="row g-5">
+            <div class="col-lg-8">
+                <div class="portfolio-details-area">
+                    <div class="image mb--40">
+                        <img src="{{ blog.thumbnail.url }}" alt="">
+                    </div>
+                    <h2 class="mb--30">Blog Content</h2>
+                    <p class="mb--30">{{ blog.content }}</p>
+
+                    <h2 class="mb--30 ">Your Trusted Partner in Car Buying and Service</h2>
+                    <p class="mb--30">Welcome to Career Compass, your ultimate destination for career advice, job search
+                        strategies, and big to an a professional development insights. Whether you're a recent graduate,
+                        seasoned professional, or someone considering a career change, our blog is your trusted guide to
+                        help you navigate the ever-evolving landscape of the job market.</p>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="sticky-top">
+                    <div class="right-side-bar">
+                        <div class="search-area side-box">
+                            <h2>Search for another blog</h2>
+                            <form action="{% url 'blog' %}" method="get">
+                                <div class="input-wrapper">
+                                    <input type="text" name="search" value="{{ request.GET.search|default:'' }}" placeholder="Search Blogs" required="">
+                                    <button type="submit"><i class="fa-regular fa-magnifying-glass"></i></button>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="recent-post side-box">
+                            <h2>Recent Post</h2>
+                            <ul class="blog-list">
+                                {% for recent_blog in recent_blogs %}
+                                <li>
+                                    <div class="image-area">
+                                        <a href="{% url 'blog_detail' recent_blog.id %}">
+                                            <img src="{{ recent_blog.thumbnail.url }}" width="100"
+                                                alt="{{ recent_blog.title }}">
+                                        </a>
+                                    </div>
+                                    <div class="content">
+                                        <h6><a href="{% url 'blog_detail' recent_blog.id %}">{{ recent_blog.title }}</a></h6>
+                                        <p class="blog-meta">{{ recent_blog.created_at }}</p>
+                                    </div>
+                                </li>
+                                {% empty %}
+                                <li>
+                                    <p>No blog added recently.</p>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <div class="ad-area">
+                            <img src="{% static 'website/images/ad.webp' %}" alt="">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock body %}

@@ -1,0 +1,309 @@
+{% extends 'website/components/base.html' %}
+
+{% load static %}
+{% load humanize %}
+
+{% block body %}
+
+<!-- rts breadcrumb area start -->
+<div class="rts-breadcrumb-area portfolio-details2 jarallax">
+    <div class="container">
+        <div class="breadcrumb-area-wrapper">
+            <div class="left">
+                <div class="nav-bread-crumb">
+                    <a href="{% url 'home' %}">Home</a>
+                    <a href="#" class="current">Cars</a>
+                </div>
+                <h1 class="title">{{ car.name }}</h1>
+                <ul class="feature-area">
+                    <li>
+                        <img src="{% static 'website/images/10.svg' %}" alt="">
+                        {{ car.mileage }} Miles
+                    </li>
+                    <li>
+                        <img src="{% static 'website/images/11.svg' %}" alt="">
+                        {{ car.get_fuel_type_display }}
+                    </li>
+                    <li>
+                        <img src="{% static 'website/images/12.svg' %}" alt="">
+                        {{ car.get_transmission_display }}
+                    </li>
+                </ul>
+            </div>
+            <div class="price-area">
+                <h5>${{ car.price|floatformat:0|intcomma }}</h5>
+                <ul class="price-meta">
+                    <li><img src="{% static 'website/images/calender.svg' %}" alt="">{{ car.created_at|naturaltime }}</li>
+                    <li><img src="{% static 'website/images/view.svg' %}" alt=""> Detailed viewport</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- rts breadcrumb area end -->
+<div class="rts-portfolio-area inner">
+    <div class="container">
+        <div class="portfolio-slider-area2 details mb--20">
+            <div class="swiper rts-heroSlider">
+                <div class="swiper-wrapper">
+                    {% if car.thumbnail %}
+                    <div class="swiper-slide">
+                        <div class="image">
+                            <img src="{{ car.thumbnail.url }}" alt="{{ car.name }}">
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% for image in car.images.all %}
+                    <div class="swiper-slide">
+                        <div class="image">
+                            <img src="{{ image.image.url }}" alt="{{ car.name }}">
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                </div>
+            </div>
+            <div class="pagination-area mt--50">
+                <div class="swiper SlideThumb">
+                    <div class="swiper-wrapper">
+
+                        {% if car.thumbnail %}
+                        <div class="swiper-slide">
+                            <div class="single-thumb">
+                                <div class="thumbnail">
+                                    <img src="{{ car.thumbnail.url }}" alt="{{ car.name }}">
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% for image in car.images.all %}
+                        <div class="swiper-slide">
+                            <div class="single-thumb">
+                                <div class="thumbnail">
+                                    <img src="{{ image.image.url }}" alt="{{ car.name }}">
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+
+                    </div>
+                    <div class="thumb-controls">
+                        <button class="thumb-prev"><i class="fa-solid fa-chevron-left"></i></button>
+                        <button class="thumb-next"><i class="fa-solid fa-chevron-right"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="portfolio-details-area">
+                    <h2 class="mb--30">Car Description</h2>
+                    <p class="mb--30">{{ car.description }}</p>
+                    <h2 class="mb--30">Car Features</h2>
+                    <ul class="feature-list mb--40">
+                        <li>
+                            <i class="fa-regular fa-circle-check"></i> Verified by AG-Enterprise
+                        </li>
+                        <li>
+                            <i class="fa-regular fa-circle-check"></i> {{ car.horsepower }} Hp
+                        </li>
+                        <li>
+                            <i class="fa-regular fa-circle-check"></i> {{ car.get_condition_display }} Car
+                        </li>
+                        <li>
+                            <i class="fa-regular fa-circle-check"></i> {{ car.stock }} cars in Stock
+                        </li>
+                        <li>
+                            <i class="fa-regular fa-circle-check"></i> {{ car.year }} Model
+                        </li>
+                        <li>
+                            <i class="fa-regular fa-circle-check"></i>
+                            {% if car.is_featured %}
+                            <span class="status-badge status-badge--featured">Featured</span>
+                            {% else %}
+                            <span class="">None-featured</span>
+                            {% endif %}
+                        </li>
+                    </ul>
+
+                    <div class="related-project">
+                        <h3 class="mb--40 text-center">Related listings</h3>
+                        <div class="row">
+                            {% for related_car in related_cars %}
+                            <div class="col-lg-6">
+                                <div class="project-wrapper2">
+                                    <div class="image-area">
+                                        <a href="{% url 'car_detail' related_car.id %}">
+                                            {% if related_car.thumbnail %}
+                                            <img src="{{ related_car.thumbnail.url }}" alt="{{ related_car.name }}">
+                                            {% endif %}
+                                        </a>
+                                        <span class="tag">{{ related_car.get_condition_display }}</span>
+                                        <a href="#" class="gallery-image">
+                                            <img src="{% static 'website/images/image.svg' %}" alt="">
+                                            {{ related_car.images.count }}
+                                        </a>
+                                    </div>
+                                    <div class="content-area">
+                                        <h6 class="title "><a href="{% url 'car_detail' related_car.id %}">
+                                            {{ related_car.name }}</a>
+                                        </h6>
+                                        <ul class="feature-area">
+                                            <li>
+                                                <img src="{% static 'website/images/01 copy.svg' %}" alt="">
+                                                {{ related_car.mileage }} Miles
+                                            </li>
+                                            <li>
+                                                <img src="{% static 'website/images/02_2.svg' %}" alt="">
+                                                {{ related_car.get_fuel_type_display }}
+                                            </li>
+                                            <li>
+                                                <img src="{% static 'website/images/03_1 copy.svg' %}" alt="">
+                                                {{ related_car.get_transmission_display }}
+                                            </li>
+
+                                        </ul>
+                                        <div class="button-area">
+                                            <p class="">${{ related_car.price|floatformat:0|intcomma }}</p>
+                                            <a href="{% url 'car_detail' related_car.id %}"
+                                                class="rts-btn btn-primary radius-small">View Details</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="col-lg-6">
+                                <h5>No related car exists.</h5>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="sticky-top">
+                    <div class="left-side-bar">
+                        <div class="overview side-box">
+                            <h2>Car Overview</h2>
+                            <ul class="feature-list2 mb--40">
+                                <li>
+                                    <img src="{% static 'website/images/09.svg' %}" alt="">
+                                    <div class="text">
+                                        <p>
+                                            Car Category
+                                        </p>
+                                        <p>
+                                            {{ car.category.name }}
+                                        </p>
+                                    </div>
+                                </li>
+                                <li>
+                                    <img src="{% static 'website/images/10.svg' %}" alt="">
+                                    <div class="text">
+                                        <p>
+                                            Mileage
+                                        </p>
+                                        <p>
+                                            {{ car.mileage }} Miles
+                                        </p>
+                                    </div>
+                                </li>
+                                <li>
+                                    <img src="{% static 'website/images/11.svg' %}" alt="">
+                                    <div class="text">
+                                        <p>
+                                            Fuel Type
+                                        </p>
+                                        <p>
+                                            {{ car.get_fuel_type_display }}
+                                        </p>
+                                    </div>
+                                </li>
+                                <li>
+                                    <img src="{% static 'website/images/12.svg' %}" alt="">
+                                    <div class="text">
+                                        <p>
+                                            Transmission
+                                        </p>
+                                        <p>
+                                            {{ car.get_transmission_display }}
+                                        </p>
+                                    </div>
+                                </li>
+                                <li>
+                                    <img src="{% static 'website/images/13.svg' %}" alt="">
+                                    <div class="text">
+                                        <p>
+                                            Brand
+                                        </p>
+                                        <p>
+                                            {{ car.brand.title }}
+                                        </p>
+                                    </div>
+                                </li>
+                                <li>
+                                    <img src="{% static 'website/images/14.svg' %}" alt="">
+                                    <div class="text">
+                                        <p>
+                                            Condition
+                                        </p>
+                                        <p>
+                                            {{ car.get_condition_display }}
+                                        </p>
+                                    </div>
+                                </li>
+                                <li>
+                                    <img src="{% static 'website/images/15.svg' %}" alt="">
+                                    <div class="text">
+                                        <p>
+                                            Engine
+                                        </p>
+                                        <p>
+                                            {{ car.engine }}
+                                        </p>
+                                    </div>
+                                </li>
+                                <li>
+                                    <img src="{% static 'website/images/16.svg' %}" alt="">
+                                    <div class="text">
+                                        <p>
+                                            Color
+                                        </p>
+                                        <p class="text-capitalize">
+                                            {{ car.color }}
+                                        </p>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="contact side-box">
+                            <h2>Contacts</h2>
+                            <div class="contact-inner">
+                                <div class="author-img">
+                                    <img src="{% static 'website/images/author.webp' %}" alt="">
+                                </div>
+                                <h5>AhGoon</h5>
+                                <p>Our one and only Car Dealer</p>
+                                <div class="contact-button-area">
+                                    <a href="tel:+959986234418" class="rts-btn radius-small btn-primary whatsapp"><img
+                                            src="{% static 'website/images/whatsapp.svg' %}" alt=""> +95-9-671683862</a>
+                                    <a href="tel:+959897379668" class="rts-btn radius-small btn-primary phone"><img
+                                            src="{% static 'website/images/phone.svg' %}" alt=""> +959671683862</a>
+                                    <a href="https://t.me/ahgoongyi" target="_blank"
+                                        class="rts-btn radius-small btn-primary telegram"><img
+                                            src="{% static 'website/images/send.svg' %}" alt="">
+                                        Send Message</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock body %}

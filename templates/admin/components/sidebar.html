@@ -1,0 +1,97 @@
+{% load static %}
+
+<div class="sidebar-backdrop" id="sidebarBackdrop" aria-hidden="true"></div>
+
+<aside class="admin-sidebar" id="adminSidebar" aria-label="Admin navigation">
+
+    <div class="sidebar-brand">
+        <a href="{% url 'home' %}" class="sidebar-brand-link" aria-label="AG-Enterprise Admin home">
+            <img src="{% static 'admin/images/logo.jpeg' %}" alt="AG-Enterprise" class="sidebar-brand-logo"
+                onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <span class="sidebar-brand-fallback" aria-hidden="true">AG</span>
+            <span class="sidebar-brand-text">AG-Enterprise</span>
+        </a>
+        <button type="button" class="sidebar-mobile-close" id="sidebarMobileClose" aria-label="Close navigation menu">
+            <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+        </button>
+    </div>
+
+    <nav class="sidebar-nav" aria-label="Sidebar menu">
+        <ul class="sidebar-menu" id="sidebarMenu">
+
+            <li class="nav-item {% if request.resolver_match.url_name == 'dashboard' %} active {% endif %}">
+                <a href="{% url 'dashboard' %}" class="nav-link" data-page="Dashboard">
+                    <span class="nav-icon"><i class="fa-solid fa-gauge-high" aria-hidden="true"></i></span>
+                    <span class="nav-label">Dashboard</span>
+                </a>
+            </li>
+
+            <li class="nav-item {% if request.resolver_match.url_name == 'car_list' %} active {% endif %}">
+                <a href="{% url 'car_list' %}" class="nav-link" data-page="Car List">
+                    <span class="nav-icon"><i class="fa-solid fa-car" aria-hidden="true"></i></span>
+                    <span class="nav-label">Cars</span>
+                </a>
+            </li>
+
+            <li class="nav-item {% if request.resolver_match.url_name == 'brand_list' %} active {% endif %}">
+                <a href="{% url 'brand_list' %}" class="nav-link" data-page="Brand List">
+                    <span class="nav-icon"><i class="fa-solid fa-tags" aria-hidden="true"></i></span>
+                    <span class="nav-label">Brands</span>
+                </a>
+            </li>
+
+            <li class="nav-item {% if request.resolver_match.url_name == 'category_list' %}active{% endif %}">
+                <a href="{% url 'category_list' %}" class="nav-link" data-page="Category List">
+                    <span class="nav-icon"><i class="fa-solid fa-folder" aria-hidden="true"></i></span>
+                    <span class="nav-label">Car Categories</span>
+                </a>
+            </li>
+
+            <li class="nav-item {% if request.resolver_match.url_name == 'sparepart_list' %}active{% endif %}">
+                <a href="{% url 'sparepart_list' %}" class="nav-link" data-page="Sparepart List">
+                    <span class="nav-icon"><i class="fa-solid fa-gears" aria-hidden="true"></i></span>
+                    <span class="nav-label">Spareparts</span>
+                </a>
+            </li>
+
+            <li class="nav-item {% if request.resolver_match.url_name == 'partcategory_list' %}active{% endif %}">
+                <a href="{% url 'partcategory_list' %}" class="nav-link" data-page="PartCategory List">
+                    <span class="nav-icon"><i class="fa-solid fa-layer-group" aria-hidden="true"></i></span>
+                    <span class="nav-label">Sparepart Categories</span>
+                </a>
+            </li>
+
+            <li class="nav-item {% if request.resolver_match.url_name == 'blog_list' %}active{% endif %}">
+                <a href="{% url 'blog_list' %}"  class="nav-link" data-page="Blog List">
+                    <span class="nav-icon"><i class="fa-solid fa-newspaper" aria-hidden="true"></i></span>
+                    <span class="nav-label">Blogs</span>
+                </a>
+            </li>
+
+            {% if request.user.is_superuser %}
+            <li class="nav-item  {% if request.resolver_match.url_name == 'contactmsg_list' %}active{% endif %}">
+                <a href="{% url 'contactmsg_list' %}" class="nav-link" data-page="Contact Messages">
+                    <span class="nav-icon"><i class="fa-solid fa-envelope" aria-hidden="true"></i></span>
+                    <span class="nav-label">Contact Messages</span>
+                </a>
+            </li>
+            {% endif %}
+
+            {% if perms.lore.view_ordermodel %}
+            <li class="nav-item {% if request.resolver_match.url_name == 'order_list' %}active{% endif %}">
+                <a href="{% url 'order_list' %}"  class="nav-link" data-page="Order List">
+                    <span class="nav-icon"><i class="fa-solid fa-receipt" aria-hidden="true"></i></span>
+                    <span class="nav-label">Orders</span>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+</aside>
+
+<div class="sidebar-flyout" id="sidebarFlyout" role="menu" aria-hidden="true">
+    <div class="sidebar-flyout-title" id="sidebarFlyoutTitle"></div>
+    <ul class="sidebar-flyout-list" id="sidebarFlyoutList"></ul>
+</div>
+
+<div class="sidebar-tooltip" id="sidebarTooltip" role="tooltip" aria-hidden="true"></div>

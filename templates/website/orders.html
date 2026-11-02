@@ -1,0 +1,211 @@
+{% extends 'website/components/base.html' %}
+
+{% load static %}
+{% load humanize %}
+
+{% block body %}
+
+<!-- Breadcrumb area start -->
+<!-- rts breadcrumb area start -->
+<div class="rts-breadcrumb-area service jarallax">
+    <div class="container">
+        <div class="breadcrumb-area-wrapper">
+            <h1 class="title">Checkout</h1>
+            <div class="nav-bread-crumb">
+                <a href="{% url 'home' %}">Home</a>
+                <a href="#" class="current">Checkout</a>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- rts breadcrumb area end -->
+<!-- Breadcrumb area end -->
+<main class="ms-main rts-section-gap">
+    <div class="ms-page-content">
+
+        <!--================= Checkout Area Start =================-->
+        <article id="post-284" class="page checkout-area type-page status-publish hentry">
+            <div class="ms-sp--header container">
+                <h2 class="title">Checkout</h2>
+            </div>
+            <div class="ms-default-page container entry-content">
+                <div class="woocommerce">
+
+                    <div class="woocommerce-notices-wrapper"></div>
+                    <form name="checkout" method="post" class="checkout woocommerce-checkout ms-woocommerce-checkout"
+                        action="#" enctype="multipart/form-data" novalidate="novalidate">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="full-grid">
+                                    <div class="billing-fields">
+                                        <div class="checkout-title">
+                                            <h3>Billing details</h3>
+                                        </div>
+                                        <div class="form-content-box">
+                                            <div class="row">
+                                                <div class="col-md-6 col-sm-12 col-xs-12">
+                                                    <div class="form-group">
+                                                        <label>First Name *</label>
+                                                        <input id="fname" name="first_name" class="form-control-mod"
+                                                            type="text" required="">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6 col-sm-12 col-xs-12">
+                                                    <div class="form-group">
+                                                        <label>Last Name *</label>
+                                                        <input id="lname" name="last_name" class="form-control-mod"
+                                                            type="text" required="">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-12 col-sm-12 col-xs-12">
+                                                    <div class="form-group">
+                                                        <label>Address *</label>
+                                                        <input id="pcode" name="address" class="form-control-mod" required=""
+                                                            type="text" placeholder="please fill exact address or your order will be cancelled">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-12 col-sm-12 col-xs-12">
+                                                    <div class="form-group">
+                                                        <label>Phone *</label>
+                                                        <input id="number" name="phone" class="form-control-mod" placeholder="please fill correctly or your order will be cancelled"
+                                                            type="text" inputmode="numeric" pattern="[0-9]+" maxlength="11" required="">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-12 col-sm-12 col-xs-12">
+                                                    <div class="form-group">
+                                                        <label>Email address *</label>
+                                                        <input id="email" name="email" class="form-control-mod"
+                                                            type="email" value="{{ request.user.email }}" required="">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="ordered-product">
+                                        <div class="checkout-title">
+                                            <h3>Your order</h3>
+                                        </div>
+                                        <table>
+                                            <thead>
+                                                <tr>
+                                                    <th>Product</th>
+                                                    <th>Total</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for item in cart_items %}
+                                                <tr>
+                                                    <td>{{ item.sparepart.name }} <strong><i class="fa fa-close"></i> {{ item.quantity|intcomma }}</strong>
+                                                    </td>
+                                                    <td>${{ item.subtotal|floatformat:2|intcomma }}</td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                            <tfoot>
+                                                <tr>
+                                                    <th>Subtotal</th>
+                                                    <th>${{ total|floatformat:2|intcomma }}</th>
+                                                </tr>
+                                                <tr>
+                                                    <th>Total</th>
+                                                    <th>${{ total|floatformat:2|intcomma }}</th>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                    </div>
+                                    <div class="payment-method mt-40 md-mt-20">
+                                        <div class="bottom-area">
+                                            <p class="mt-15">Your personal data will be used to process your order,
+                                                support your
+                                                experience throughout this website, and for other purposes described
+                                                in our privacy
+                                                policy.</p>
+                                            <button class="add-btn rts-btn btn-primary" type="submit">Place Order</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="pl-lg-5 col-md-4">
+                                <h3 id="order_review_heading">Your order</h3>
+                                <div id="order_review" class="woocommerce-checkout-review-order">
+                                    <table
+                                        class="ms-checkout-review-order-table shop_table woocommerce-checkout-review-order-table">
+                                        <tbody>
+                                            {% for item in cart_items %}
+                                            <tr class="cart_item">
+                                                <td colspan="2">
+                                                    <div class="ms-checkout-product">
+                                                        <div class="ms-checkout-product__thumbnail">
+                                                            <img src="{{ item.sparepart.thumbnail.url }}"
+                                                                class="attachment-woocommerce_thumbnail size-woocommerce_thumbnail"
+                                                                alt="{{ item.sparepart.name }}">
+                                                        </div>
+                                                        <div class="ms-checkout-product__content">
+                                                            <h5>{{ item.sparepart.name }} 
+                                                                <span class="product-quantity">× {{ item.quantity|intcomma }}</span>
+                                                            </h5>
+                                                            <span class="woocommerce-Price-amount amount">
+                                                                <bdi>
+                                                                    <span class="woocommerce-Price-currencySymbol">$</span>{{ item.subtotal|floatformat:2|intcomma }}
+                                                                </bdi>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                        <tfoot>
+                                            <tr class="cart-subtotal">
+                                                <th>Subtotal</th>
+                                                <td>
+                                                    <span class="woocommerce-Price-amount amount">
+                                                        <bdi>
+                                                            <span class="woocommerce-Price-currencySymbol">$</span>{{ total|floatformat:2|intcomma }}
+                                                        </bdi>
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                            <tr class="order-total">
+                                                <th>Total</th>
+                                                <td>
+                                                    <strong>
+                                                        <span class="woocommerce-Price-amount amount">
+                                                            <bdi>
+                                                                <span
+                                                                    class="woocommerce-Price-currencySymbol">$</span>{{ total|floatformat:2|intcomma }}
+                                                            </bdi>
+                                                        </span>
+                                                    </strong>
+                                                </td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                    <div id="payment" class="woocommerce-checkout-payment">
+                                        <ul class="wc_payment_methods payment_methods methods">
+                                            <li class="woocommerce-notice woocommerce-notice--info woocommerce-info">
+                                                Please double check your delivery information.Orders with invalid information will be automatically cancelled.
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </article>
+        <!--================= Checkout Area End =================-->
+    </div>
+</main>
+
+{% endblock body %}

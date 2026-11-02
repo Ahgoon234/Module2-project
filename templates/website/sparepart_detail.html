@@ -1,0 +1,158 @@
+{% extends 'website/components/base.html' %}
+
+{% load static %}
+{% load humanize %}
+
+{% block body %}
+
+<div class="rts-portfolio-area shop-single inner rts-section-gapTop">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-7">
+                <div class="portfolio-slider-area2 mb--40">
+                    <div class="swiper projectSlider4">
+                        <div class="swiper-wrapper">
+
+                            <!-- Thumbnail -->
+                            {% if sparepart.thumbnail %}
+                            <div class="swiper-slide">
+                                <div class="image">
+                                    <img src="{{ sparepart.thumbnail.url }}" alt="{{ sparepart.name }}">
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            {% for image in sparepart.images.all %}
+                            <div class="swiper-slide">
+                                <div class="image">
+                                    <img src="{{ image.image.url }}" alt="{{ sparepart.name }}">
+                                </div>
+                            </div>
+                            {% endfor %}
+
+                        </div>
+                    </div>
+                    <div class="slider-pagination-area shop-single">
+                        <div class="swiper-pagination"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="ms-single-product__content">
+                    <p class="sub-title"><a href="{% url 'home' %}">Home</a>{{ sparepart.name }}</p>
+                    <h3 class="ms-single-product_title">{{ sparepart.name }}</h3>
+                    <div class="woocommerce-product-details__short-description">
+                        <p>At AG-Enterprise/Auto-Repair, the goal is to provide top-notch automotive to keep your
+                            vehicle running smoothly. Whether it’s a routine oil change, brake replacement, or complex
+                            engine repair, the skilled technicians at Max Auto are equipped with the latest tools and
+                            knowledge to vehicles, from sedans to SUVs.</p>
+                    </div>
+                    <div class="woocommerce-Price-amount amount">
+                        <bdi><span class="woocommerce-Price-currencySymbol">$</span>{{ sparepart.price|floatformat:2|intcomma }}</bdi>
+                    </div>
+                    <div class="product-stock mt--15 mb--20">
+                        <span class="stock-span fs-2">Stock: </span>
+                        <strong class="stock-number fs-2">{{ sparepart.stock|intcomma }}</strong>
+                    </div>
+                    <form action="{% url 'add_to_cart' sparepart.id %}" method="post" class="quantity-area">
+                        {% csrf_token %}
+                        <div class="cart-edit">
+                            <div class="quantity-edit">
+                                <button type="button" class="button decrement"><i class="fal fa-minus minus"></i></button>
+                                <input type="text" name="quantity" class="input" data-stock="{{ sparepart.stock }}" value="1" readonly>
+                                <button type="button" class="button increment"><i class="fa-sharp fa-solid fa-plus"></i></button>
+                            </div>
+                        </div>
+                        <button type="submit" class="rts-btn btn-primary radius-small">Add to cart</button>
+                    </form>
+                    <div class="product_meta">
+                        <ul>
+                            <li class="posted_in">Categories :<span class="mt-4 mx-0">{{ sparepart.category }} </span></li>
+                            <li class="sku_wrapper">Parts Brand :<span class="mt-4 mx-0">{{ sparepart.brand }}</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12 tab-area">
+                <!-- Nav tabs -->
+                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home"
+                            type="button" role="tab" aria-controls="home" aria-selected="true">Description</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile"
+                            type="button" role="tab" aria-controls="profile" aria-selected="false">Delivery
+                            Info</button>
+                    </li>
+                </ul>
+                <!-- Tab panes -->
+                <div class="tab-content">
+                    <div class="tab-pane active" id="home" role="tabpanel" aria-labelledby="home-tab" tabindex="0">{{ sparepart.description }}</div>
+                    <div class="tab-pane" id="profile" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
+                        <div class="ms-section-title">
+                            <h3 class="ms-heading-title"> Delivery Info</h3>
+                            <ul>
+                                <li>
+                                    <i class="fa-regular fa-circle-check"></i>At AG-AutoTech Supplies, we offer fast and
+                                    reliable delivery parts and accessories
+                                </li>
+                                <li>
+                                    <i class="fa-regular fa-circle-check"></i>Orders placed before 2 PM are typically
+                                    the same day,ranging business days.
+                                </li>
+                                <li>
+                                    <i class="fa-regular fa-circle-check"></i>Expedited shipping options are available
+                                    for urgent needs, day delivery locations.
+                                </li>
+                                <li>
+                                    <i class="fa-regular fa-circle-check"></i>At AG-AutoTech Supplies, every parts or
+                                    accessories are 100% reliable and any error will be fully refunded.
+                                </li>
+                                <li>
+                                    <i class="fa-regular fa-circle-check"></i>Orders cancellation can be done anyitme
+                                    before the goods are arrived.
+                                </li>
+                                <li>
+                                    <i class="fa-regular fa-circle-check"></i>24Hours fully responsive for customer
+                                    satification.
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="related-project">
+                <h3 class="mb--40 mt--40 text-center">Related listings</h3>
+                <div class="row">
+                    {% for related_sparepart in related_spareparts %}
+                    <div class="col-lg-4 col-md-6">
+                        <div class="project-wrapper4">
+                            <div class="image-area">
+                                <a href="{% url 'sparepart_detail' related_sparepart.id %}"><img src="{{ related_sparepart.thumbnail.url }}" alt=""></a>
+                            </div>
+                            <div class="content-area">
+                                <h6 class="title "><a href="{% url 'sparepart_detail' related_sparepart.id %}">{{ related_sparepart.name }}</a>
+                                </h6>
+                                <div class="button-area">
+                                    <p class="">${{ related_sparepart.price|floatformat:2|intcomma }}</p>
+                                    <a href="{% url 'sparepart_detail' related_sparepart.id %}" class="rts-btn btn-primary radius-big icon">
+                                        View Detail
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="col-lg-4 col-md-6">
+                        <h6>No related sparepart exists.</h6>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock body %}

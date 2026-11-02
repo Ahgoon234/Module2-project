@@ -1,0 +1,645 @@
+{% extends 'admin/components/base.html' %}
+
+{% load static %}
+
+{% block body %}
+
+<main class="admin-content" id="adminContent">
+
+    <div class="dashboard-header">
+        <div>
+            <h2 class="dashboard-title text-capitalize">Welcome back, {{ request.user.username }}</h2>
+            <p class="dashboard-subtitle">Overview of your AG-Enterprise inventory and activity.</p>
+        </div>
+    </div>
+
+    <!-- Statistics cards -->
+    <section class="stats-grid" aria-label="Statistics overview">
+        <article class="stat-card">
+            <div class="stat-card-icon stat-card-icon--cars">
+                <i class="fa-solid fa-car" aria-hidden="true"></i>
+            </div>
+            <div class="stat-card-body">
+                <span class="stat-card-label">Total Cars</span>
+                <span class="stat-card-value">{{ cars.count }}</span>
+            </div>
+        </article>
+
+        <article class="stat-card">
+            <div class="stat-card-icon stat-card-icon--brands">
+                <i class="fa-solid fa-tags" aria-hidden="true"></i>
+            </div>
+            <div class="stat-card-body">
+                <span class="stat-card-label">Total Brands</span>
+                <span class="stat-card-value">{{ brands.count }}</span>
+            </div>
+        </article>
+
+        <article class="stat-card">
+            <div class="stat-card-icon stat-card-icon--categories">
+                <i class="fa-solid fa-folder" aria-hidden="true"></i>
+            </div>
+            <div class="stat-card-body">
+                <span class="stat-card-label">Total Car Categories</span>
+                <span class="stat-card-value">{{ categories.count }}</span>
+            </div>
+        </article>
+
+        <article class="stat-card">
+            <div class="stat-card-icon stat-card-icon--parts">
+                <i class="fa-solid fa-gears" aria-hidden="true"></i>
+            </div>
+            <div class="stat-card-body">
+                <span class="stat-card-label">Total Spare Parts</span>
+                <span class="stat-card-value">{{ spareparts.count }}</span>
+            </div>
+        </article>
+    </section>
+
+    <div class="dashboard-grid">
+
+        <!-- Recent Brands -->
+        <section class="dashboard-card">
+            <div class="dashboard-card-header">
+                <h3 class="dashboard-card-title">Recent Brands</h3>
+                <a href="{% url 'brand_list' %}" class="dashboard-card-link">View all</a>
+            </div>
+            <ul class="recent-list">
+                {% for brand in brands|slice:":4" %}
+                <li>
+                    <img src="{{ brand.logo.url }}" alt="{{ brand.title }}" class="recent-thumb recent-thumb--car">
+                    <div class="recent-info">
+                        <strong>{{ brand.title }}</strong>
+                        <span>{{ brand.created_at }}</span>
+                    </div>
+                </li>
+                {% empty %}
+                <li>
+                    <span>No Brand Found.</span>
+                </li>
+                {% endfor %}
+            </ul>
+        </section>
+
+        <!-- Recent Spare Parts -->
+        <section class="dashboard-card">
+            <div class="dashboard-card-header">
+                <h3 class="dashboard-card-title">Recent Spare Parts</h3>
+                <a href="{% url 'sparepart_list' %}" class="dashboard-card-link">View all</a>
+            </div>
+            <ul class="recent-list">
+                {% for sparepart in spareparts|slice:":4" %}
+                <li>
+                    <img src="{{ sparepart.thumbnail.url }}" class="recent-thumb recent-thumb--part">
+                    <div class="recent-info">
+                        <strong>{{ sparepart.name }}</strong>
+                        <span>{{ sparepart.brand.title }} · {{ sparepart.stock}}</span>
+                    </div>
+                </li>
+                {% empty %}
+                <li>
+                    <span>No Sparepart Found.</span>
+                </li>
+                {% endfor %}
+            </ul>
+        </section>
+
+        <!-- Recent Blogs -->
+        <section class="dashboard-card">
+            <div class="dashboard-card-header">
+                <h3 class="dashboard-card-title">Recent Blogs</h3>
+                <a href="{% url 'blog_list' %}" class="dashboard-card-link">View all</a>
+            </div>
+            <ul class="activity-list">
+                {% for blog in blogs|slice:":4" %}
+                <li>
+                    <img src="{{ blog.thumbnail.url }}" alt="{{ blog.title }}" class="recent-thumb recent-thumb--car">
+                    <div>
+                        <strong>{{ blog.title }}</strong>
+                        <span>{{ blog.created_at }}</span>
+                    </div>
+                </li>
+                {% empty %}
+                <li>
+                    <span>No Blog Found.</span>
+                </li>
+                {% endfor %}
+            </ul>
+        </section>
+
+        <!-- Quick Actions -->
+        <section class="dashboard-card">
+            <div class="dashboard-card-header">
+                <h3 class="dashboard-card-title">Quick Actions</h3>
+            </div>
+            <div class="quick-actions">
+                <a href="#" class="quick-action-btn" data-admin-action="create" data-admin-module="car">
+                    <i class="fa-solid fa-car" aria-hidden="true"></i>
+                    Add Car
+                </a>
+                <a href="#" class="quick-action-btn" data-admin-action="create" data-admin-module="brand">
+                    <i class="fa-solid fa-tags" aria-hidden="true"></i>
+                    Add Brand
+                </a>
+                <a href="#" class="quick-action-btn" data-admin-action="create" data-admin-module="category">
+                    <i class="fa-solid fa-folder" aria-hidden="true"></i>
+                    Add Category
+                </a>
+                <a href="#" class="quick-action-btn" data-admin-action="create" data-admin-module="sparepart">
+                    <i class="fa-solid fa-gears" aria-hidden="true"></i>
+                    Add Spare Part
+                </a>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Recent Cars Table -->
+    <section class="dashboard-card dashboard-card--table">
+        <div class="dashboard-card-header">
+            <h3 class="dashboard-card-title">Recent Cars</h3>
+            <a href="{% url 'car_list' %}" class="dashboard-card-link">View all</a>
+        </div>
+        <div class="table-responsive">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Car</th>
+                        <th>Brand</th>
+                        <th>Year</th>
+                        <th>Price</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for car in cars|slice:":5" %}
+                    <tr>
+                        <td data-label="Car">
+                            <div class="table-car">
+                                <img src="{{ car.thumbnail.url }}" alt="{{ car.name }}" class="table-car-thumb">
+                                {{ car.name }}
+                            </div>
+                        </td>
+                        <td data-label="Brand">{{ car.brand.title }}</td>
+                        <td data-label="Year">{{ car.year }}</td>
+                        <td data-label="Price">${{ car.price }}</td>
+                        <td data-label="Status">
+                            {% if car.condition == 'new' %}
+                            <span class="status-badge status-badge--available">{{ car.get_condition_display }}</span>
+                            {% else %}
+                            <span class="status-badge status-badge--sold">{{ car.get_condition_display }}</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="11">No Car found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+</main>
+{% endblock body %}
+
+{% block form %}
+
+<div class="admin-modal" id="carModal" data-admin-modal data-admin-module="car" aria-hidden="true">
+    <div class="admin-modal-backdrop" data-modal-close></div>
+    <section class="admin-modal-dialog admin-modal-dialog--large" role="dialog" aria-modal="true"
+        aria-labelledby="carModalTitle">
+        <div class="admin-modal-header">
+            <div><span class="admin-modal-kicker">Car Details Form</span>
+                <h2 class="admin-modal-title" id="carModalTitle" data-modal-title>Add New Car</h2>
+                <p class="admin-modal-subtitle" data-modal-subtitle>Enter the details below to add a new car.</p>
+            </div>
+            <button type="button" class="admin-modal-close" data-modal-close aria-label="Close car form"><i
+                    class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+        </div>
+        <form method="post" action="{% url 'car_create' %}" data-create-url="{% url 'car_create' %}"
+            data-update-base-url="{% url 'car_update' '00000000-0000-0000-0000-000000000000' %}"
+            enctype="multipart/form-data" id="carForm" class="admin-modal-form" data-modal-form novalidate>
+            {% csrf_token %}
+            <div class="admin-modal-body">
+                <div class="admin-form-grid">
+                    <div class="admin-field">
+                        <label>Name</label>
+                        <input type="text" id="carName" name="name" required placeholder="e.g. BMW M4 Competition">
+                    </div>
+                    <div class="admin-field">
+                        <label>Brand</label>
+                        <select id="carBrand" name="brand" required>
+                            <option value="">Select an option</option>
+
+                            {% for brand in brands %}
+                            <option value="{{ brand.id }}">{{ brand.title }}</option>
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+                    <div class="admin-field">
+                        <label>Category</label>
+                        <select id="carCategory" name="category" required>
+                            <option value="">Select an option</option>
+
+                            {% for category in categories %}
+                            <option value="{{ category.id }}">{{ category.name }}</option>
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+                    <div class="admin-field">
+                        <label>Condition</label>
+                        <select id="carCondition" name="condition" required>
+
+                            {% for value,label in condition_choices %}
+                            <option value="{{ value }}">{{ label }}</option>
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+                    <div class="admin-field">
+
+                        <label>Price</label>
+                        <input type="number" id="carPrice" name="price" min="0.01" step="0.01" required placeholder="0.00">
+
+                    </div>
+
+                    <div class="admin-field">
+
+                        <label>Stock</label>
+                        <input type="number" id="carStock" name="stock" required placeholder="0">
+
+                    </div>
+
+                    <div class="admin-field">
+
+                        <label>Year</label>
+                        <input type="number" id="carYear" name="year" required placeholder="2026">
+
+                    </div>
+
+                    <div class="admin-field">
+
+                        <label>Mileage</label>
+                        <input type="number" id="carMileage" name="mileage" min="0" step="1" required placeholder="0">
+
+                    </div>
+
+                    <div class="admin-field">
+
+                        <label>Color</label>
+                        <input type="text" id="carColor" name="color" required placeholder="Obsidian Black">
+
+                    </div>
+                    <div class="admin-field">
+                        <label>Fuel Type</label>
+                        <select id="carFuelType" name="fuel_type" required>
+
+                            {% for value,label in fuel_choices %}
+                            <option value="{{ value }}">{{ label }}</option>
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+                    <div class="admin-field">
+                        <label>Transmission</label>
+                        <select id="carTransmission" name="transmission" required>
+
+                            {% for value,label in transmission_choices %}
+                            <option value="{{ value }}">{{ label }}</option>
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+                    <div class="admin-field">
+
+                        <label>Engine</label>
+                        <input type="text" id="carEngine" name="engine" required placeholder="2.0L Turbocharged">
+
+                    </div>
+                    <div class="admin-field">
+
+                        <label>Horsepower</label>
+                        <input type="number" id="carHorsepower" name="horsepower" required placeholder="0">
+
+                    </div>
+
+                    <div class="admin-field admin-field--full">
+
+                        <label>Description</label>
+                        <textarea id="carDescription" name="description" rows="4" required
+                            placeholder="Add a short description of the vehicle"></textarea>
+
+                    </div>
+
+                    <div class="admin-field">
+                        <label>Thumbnail</label>
+                        <div class="admin-image-upload">
+                            <input type="file" id="carThumbnail" name="thumbnail" accept="image/webp" data-image-input
+                                data-preview-target="carThumbnailPreview">
+                            <label class="admin-upload-control" for="carThumbnail">
+                                <span class="admin-upload-icon"><i class="fa-solid fa-cloud-arrow-up"
+                                        aria-hidden="true"></i></span>
+                                <span class="admin-upload-copy"><strong>Car thumbnail</strong><small
+                                        data-upload-label>Choose image</small></span>
+                            </label>
+                            <div class="admin-single-preview" id="carThumbnailPreview" data-single-preview hidden>
+                                <img src="{{ car.thumbnail.url }}" alt="Car thumbnail preview"
+                                    data-single-preview-image>
+                                <div class="admin-single-preview-copy"><strong data-preview-name>No image
+                                        selected</strong><small>Preview only</small></div>
+                                <button type="button" class="admin-image-clear" data-clear-single
+                                    data-input-id="carThumbnail" aria-label="Remove selected car thumbnail"><i
+                                        class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+                                <input type="hidden" name="thumbnail_existing" data-existing-image>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="admin-field admin-field--checkbox">
+                        <span class="admin-field-label">Visibility</span>
+                        <label class="admin-checkbox"><input type="checkbox" id="carIsFeatured" name="is_featured"><span
+                                class="admin-checkbox-box"><i class="fa-solid fa-check"
+                                    aria-hidden="true"></i></span><span>Is Featured</span></label>
+                    </div>
+                    <div class="admin-form-section admin-field--full">
+                        <div class="admin-form-section-heading">
+                            <div><span class="admin-field-label">Gallery Images</span><small>Additional images for the
+                                    vehicle gallery</small></div><span class="admin-section-badge">Multiple</span>
+                        </div>
+                        <div class="admin-gallery-upload">
+                            <input type="file" id="carGallery" name="gallery_images" accept="image/webp" multiple
+                                data-gallery-input>
+                            <label class="admin-upload-control admin-upload-control--gallery" for="carGallery"><span
+                                    class="admin-upload-icon"><i class="fa-solid fa-images"
+                                        aria-hidden="true"></i></span><span class="admin-upload-copy"><strong>Choose
+                                        gallery images</strong><small>Add more images at any
+                                        time</small></span><span class="admin-upload-action">Browse</span></label>
+                        </div>
+                        <div class="admin-gallery-preview" data-gallery-preview aria-live="polite">
+                            <div class="admin-gallery-empty">No gallery images selected yet.</div>
+                        </div>
+                        <div id="carDeletedImages"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="admin-modal-footer"><span class="admin-modal-disclaimer text-danger">Please double-check your details before
+                    submitting. Any mistakes may affect data accuracy and will be considered a performance issue.</span>
+                <div class="admin-modal-actions">
+                    <button type="button" class="ag-btn ag-btn-secondary" data-modal-close>Cancel</button>
+                    <button type="submit" class="ag-btn ag-btn-primary" data-submit-button>Create Car</button>
+                </div>
+            </div>
+        </form>
+    </section>
+</div>
+
+<!-- Category Form -->
+<div class="admin-modal" id="categoryModal" data-admin-modal data-admin-module="category" aria-hidden="true">
+    <div class="admin-modal-backdrop" data-modal-close></div>
+    <section class="admin-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="categoryModalTitle">
+        <div class="admin-modal-header">
+            <div><span class="admin-modal-kicker">Car Category Managing Form</span>
+                <h2 class="admin-modal-title" id="categoryModalTitle" data-modal-title>Add New Category</h2>
+                <p class="admin-modal-subtitle" data-modal-subtitle>Enter the details below to add a new category.
+                </p>
+            </div>
+            <button type="button" class="admin-modal-close" data-modal-close aria-label="Close category form"><i
+                    class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+        </div>
+        <form method="post" action="{% url 'category_create' %}" data-create-url="{% url 'category_create' %}"
+            data-update-base-url="{% url 'category_update' '00000000-0000-0000-0000-000000000000' %}"
+            enctype="multipart/form-data" id="categoryForm" class="admin-modal-form" data-modal-form novalidate>
+            {% csrf_token %}
+            <div class="admin-modal-body">
+                <div class="admin-form-grid">
+                    <div class="admin-field">
+                        <label>Name</label>
+                        <input type="text" id="categoryName" name="name" required placeholder="e.g. Sedan">
+
+                    </div>
+                    <div class="admin-field">
+                        <label>Image</label>
+                        <div class="admin-image-upload">
+                            <input type="file" id="categoryImage" name="image" accept="image/*" data-image-input
+                                data-preview-target="categoryImagePreview">
+                            <label class="admin-upload-control" for="categoryImage">
+                                <span class="admin-upload-icon"><i class="fa-solid fa-cloud-arrow-up"
+                                        aria-hidden="true"></i></span>
+                                <span class="admin-upload-copy"><strong>Category image</strong><small
+                                        data-upload-label>Choose image</small></span>
+                            </label>
+                            <div class="admin-single-preview" id="categoryImagePreview" data-single-preview hidden>
+                                <img src="" alt="Category image preview" data-single-preview-image>
+                                <div class="admin-single-preview-copy"><strong data-preview-name>No image
+                                        selected</strong><small>Preview only</small></div>
+                                <button type="button" class="admin-image-clear" data-clear-single
+                                    data-input-id="categoryImage" aria-label="Remove selected category image"><i
+                                        class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+                                <input type="hidden" name="image_existing" data-existing-image>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="admin-modal-footer"><span class="admin-modal-disclaimer text-danger">Please double-check your details before
+                    submitting. Any mistakes may affect data accuracy and will be considered a performance issue.</span>
+                <div class="admin-modal-actions"><button type="button" class="ag-btn ag-btn-secondary"
+                        data-modal-close>Cancel</button><button type="submit" class="ag-btn ag-btn-primary"
+                        data-submit-button>Create Category</button></div>
+            </div>
+        </form>
+    </section>
+</div>
+
+<!-- Brand Form -->
+<div class="admin-modal" id="brandModal" data-admin-modal data-admin-module="brand" aria-hidden="true">
+    <div class="admin-modal-backdrop" data-modal-close></div>
+    <section class="admin-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="brandModalTitle">
+        <div class="admin-modal-header">
+            <div><span class="admin-modal-kicker">Brands Managing Form</span>
+                <h2 class="admin-modal-title" id="brandModalTitle" data-modal-title>Add New Brand</h2>
+                <p class="admin-modal-subtitle" data-modal-subtitle>Enter the details below to add a new brand.</p>
+            </div>
+            <button type="button" class="admin-modal-close" data-modal-close aria-label="Close brand form"><i
+                    class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+        </div>
+        <form method="post" action="{% url 'brand_create' %}" data-create-url="{% url 'brand_create' %}"
+            data-update-base-url="{% url 'brand_update' '00000000-0000-0000-0000-000000000000' %}"
+            enctype="multipart/form-data" id="brandForm" class="admin-modal-form" data-modal-form novalidate>
+            {% csrf_token %}
+            <input type="hidden" name="brand_id" id="brandId">
+            <div class="admin-modal-body">
+                <div class="admin-form-grid">
+                    <div class="admin-field">
+                        <label>Title</label>
+                        <input type="text" id="brandTitle" name="title" required placeholder="e.g. Toyota">
+
+                    </div>
+                    <div class="admin-field">
+                        <label>Logo</label>
+                        <div class="admin-image-upload">
+                            <input type="file" id="brandLogo" name="logo" accept="image/*" data-image-input
+                                data-preview-target="brandLogoPreview">
+                            <label class="admin-upload-control" for="brandLogo">
+                                <span class="admin-upload-icon"><i class="fa-solid fa-cloud-arrow-up"
+                                        aria-hidden="true"></i></span>
+                                <span class="admin-upload-copy"><strong>Brand logo</strong><small
+                                        data-upload-label>Choose image</small></span>
+                            </label>
+                            <div class="admin-single-preview" id="brandLogoPreview" data-single-preview hidden>
+                                <img src="" alt="Brand logo preview" data-single-preview-image>
+                                <div class="admin-single-preview-copy"><strong data-preview-name>No image
+                                        selected</strong><small>Preview only</small></div>
+                                <button type="button" class="admin-image-clear" data-clear-single
+                                    data-input-id="brandLogo" aria-label="Remove selected brand logo"><i
+                                        class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+                                <input type="hidden" name="logo_existing" data-existing-image>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="admin-modal-footer"><span class="admin-modal-disclaimer text-danger">Please double-check your details before
+                    submitting. Any mistakes may affect data accuracy and will be considered a performance issue.</span>
+                <div class="admin-modal-actions"><button type="button" class="ag-btn ag-btn-secondary"
+                        data-modal-close>Cancel</button><button type="submit" class="ag-btn ag-btn-primary"
+                        data-submit-button>Create Brand</button></div>
+            </div>
+        </form>
+    </section>
+</div>
+
+<!-- Sparepart Form -->
+<div class="admin-modal" id="sparepartModal" data-admin-modal data-admin-module="sparepart" aria-hidden="true">
+    <div class="admin-modal-backdrop" data-modal-close></div>
+    <section class="admin-modal-dialog admin-modal-dialog--large" role="dialog" aria-modal="true"
+        aria-labelledby="sparepartModalTitle">
+        <div class="admin-modal-header">
+            <div><span class="admin-modal-kicker">Sparepart Details Form</span>
+                <h2 class="admin-modal-title" id="sparepartModalTitle" data-modal-title>Add New Sparepart</h2>
+                <p class="admin-modal-subtitle" data-modal-subtitle>Enter the details below to add a new sparepart.
+                </p>
+            </div>
+            <button type="button" class="admin-modal-close" data-modal-close aria-label="Close sparepart form"><i
+                    class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+        </div>
+        <form method="post" action="{% url 'sparepart_create' %}" data-create-url="{% url 'sparepart_create' %}"
+            data-update-base-url="{% url 'sparepart_update' '00000000-0000-0000-0000-000000000000' %}"
+            enctype="multipart/form-data" id="sparepartForm" class="admin-modal-form" data-modal-form novalidate>
+            {% csrf_token %}
+            <div class="admin-modal-body">
+                <div class="admin-form-grid">
+                    <div class="admin-field">
+                        <label>Name</label>
+                        <input type="text" id="sparepartName" name="name" required placeholder="e.g. Brake Pad">
+
+                    </div>
+                    <div class="admin-field">
+                        <label>Brand</label>
+                        <select id="sparepartBrand" name="brand" required>
+                            <option value="">Select an option</option>
+                            {% for brand in brands %}
+                            <option value="{{ brand.id }}">{{ brand.title }}</option>
+                            {% endfor %}
+                        </select>
+
+                    </div>
+                    <div class="admin-field">
+                        <label>Category</label>
+                        <select id="sparepartCategory" name="partcategory" required>
+                            <option value="">Select an option</option>
+                            {% for partcategory in partcategories %}
+                            <option value="{{ partcategory.id }}">{{ partcategory.name }}</option>
+                            {% endfor %}
+                        </select>
+
+                    </div>
+                    <div class="admin-field">
+                        <label>Stock</label>
+                        <input type="number" id="sparepartStock" name="stock" required placeholder="0">
+
+                    </div>
+                    <div class="admin-field">
+                        <label>Price</label>
+                        <input type="number" id="sparepartPrice" name="price" min="0.01" step="0.01" required placeholder="0.00">
+
+                    </div>
+
+                    <div class="admin-field admin-field--full">
+                        <label>Description</label>
+                        <textarea id="sparepartDescription" name="description" rows="4" required
+                            placeholder="Add a short description of the spare part"></textarea>
+
+                    </div>
+                    <div class="admin-field">
+                        <label>Thumbnail</label>
+                        <div class="admin-image-upload">
+                            <input type="file" id="sparepartThumbnail" name="thumbnail" accept="image/*"
+                                data-image-input data-preview-target="sparepartThumbnailPreview">
+                            <label class="admin-upload-control" for="sparepartThumbnail">
+                                <span class="admin-upload-icon"><i class="fa-solid fa-cloud-arrow-up"
+                                        aria-hidden="true"></i></span>
+                                <span class="admin-upload-copy"><strong>Sparepart thumbnail</strong><small
+                                        data-upload-label>Choose image</small></span>
+                            </label>
+                            <div class="admin-single-preview" id="sparepartThumbnailPreview" data-single-preview hidden>
+                                <img src="" alt="Sparepart thumbnail preview" data-single-preview-image>
+                                <div class="admin-single-preview-copy"><strong data-preview-name>No image
+                                        selected</strong><small>Preview only</small></div>
+                                <button type="button" class="admin-image-clear" data-clear-single
+                                    data-input-id="sparepartThumbnail"
+                                    aria-label="Remove selected sparepart thumbnail"><i class="fa-solid fa-xmark"
+                                        aria-hidden="true"></i></button>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="admin-form-section admin-field--full">
+                        <div class="admin-form-section-heading">
+                            <div><span class="admin-field-label">Gallery Images</span><small>Additional images for
+                                    the sparepart gallery</small></div><span class="admin-section-badge">Multiple</span>
+                        </div>
+                        <div class="admin-gallery-upload">
+                            <input type="file" id="sparepartGallery" name="gallery_images" accept="image/*" multiple
+                                data-gallery-input>
+                            <label class="admin-upload-control admin-upload-control--gallery"
+                                for="sparepartGallery"><span class="admin-upload-icon"><i class="fa-solid fa-images"
+                                        aria-hidden="true"></i></span><span class="admin-upload-copy"><strong>Choose
+                                        gallery images</strong><small>Add more images at any
+                                        time</small></span><span class="admin-upload-action">Browse</span></label>
+                        </div>
+                        <div class="admin-gallery-preview" data-gallery-preview aria-live="polite">
+                            <div class="admin-gallery-empty">No gallery images selected yet.</div>
+                        </div>
+                        <div id="sparepartDeletedImages" data-deleted-images></div>
+                    </div>
+                </div>
+            </div>
+            <div class="admin-modal-footer"><span class="admin-modal-disclaimer text-danger">Please double-check your details before
+                    submitting. Any mistakes may affect data accuracy and will be considered a performance issue.</span>
+                <div class="admin-modal-actions">
+                    <button type="button" class="ag-btn ag-btn-secondary" data-modal-close>Cancel</button>
+                    <button type="submit" class="ag-btn ag-btn-primary" data-submit-button>Create Sparepart</button>
+                </div>
+            </div>
+        </form>
+    </section>
+</div>
+
+{% endblock form %}

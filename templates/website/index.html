@@ -1,0 +1,493 @@
+{% extends 'website/components/base.html' %}
+
+{% load static %}
+{% load humanize %}
+
+{% block body %}
+
+<section class="rts-banner-area bg_image_one jarallax">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="banner-area-one bg_image">
+                    <div class="banner-content-area">
+                        <div class="pre-title wow fadeInUp" data-wow-delay=".2s" data-wow-duration="1s">
+                            <span>Shop With Confidence – Quality Vehicles</span>
+                        </div>
+                        <h1 class="title wow fadeInUp" data-wow-delay=".4s" data-wow-duration="1s">Discover
+                            Our Best Deals On
+                            New And Used <span>Cars</span></h1>
+                        <form action="{% url 'cars' %}" method="get"  accept-charset="utf-8">
+                            <div class="select-area-down wow fadeInUp" data-wow-delay=".8s" data-wow-duration="1s">
+
+                                <div class="select-2">
+                                    <select name="brand" class="mySelect">
+                                        <option value="" selected="">Brand</option>
+                                        {% for brand in brands %}
+                                        <option value="{{ brand.id }}">{{ brand.title }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                
+                                <div class="select-2">
+                                    <select name="category" class="my_select2">
+                                        <option value="" selected="">Category</option>
+                                        {% for category in categories %}
+                                        <option value="{{ category.id }}">{{ category.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                
+                                <div class="select-2">
+                                    <select name="fuel_type" class="my_select2">
+                                        <option value="" selected="">Fuel-Type</option>
+                                        {% for value,label in fuel_choices %}
+                                        <option value="{{ value }}">{{ label }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <button type="submit" class="rts-btn radius-big icon btn-primary">
+                                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <path
+                                            d="M10.69 10.69L13 13M12.3333 6.68575C12.3333 9.826 9.796 12.3715 6.667 12.3715C3.53725 12.3715 1 9.826 1 6.6865C1 3.54475 3.53725 1 6.66625 1C9.796 1 12.3333 3.5455 12.3333 6.68575Z"
+                                            stroke="white" stroke-width="1.5" stroke-linecap="round"
+                                            stroke-linejoin="round">
+                                        </path>
+                                    </svg>
+                                    Search
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Banner area end -->
+
+<!-- Category Area Start -->
+<section class="rts-category-area rts-section-gap">
+    <div class="container">
+        <div class="section-title-area">
+            <p class="sub-title wow fadeInUp" data-wow-delay=".1s" data-wow-duration=".8s">Car Category</p>
+            <h2 class="section-title wow move-right">Browse By <span>Car</span> Type</h2>
+        </div>
+        <div class="section-inner wow fadeInUp" data-wow-delay=".3s" data-wow-duration="1s">
+            <div class="swiper category-slider">
+                <div class="swiper-wrapper">
+                    {% for category in categories %}
+                    <div class="swiper-slide">
+                        <div class="category-wrapper">
+                            <div class="icon">
+                                {% if category.image %}
+                                <img src="{{ category.image.url }}" alt="{{ category.name }}">
+                                {% else%}
+                                <div class="category-placeholder">
+                                    <i class="fa-solid fa-image"></i>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <h6 class="title"><a href="#">{{ category.name }}</a></h6>
+                            <p class="desc">{{ category.cars.count }} Cars</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="swiper-pagination"></div>
+            </div>
+        </div>
+    </div>
+    <div class="bg-shape-area">
+        <img src="{% static 'website/images/shape-01.svg' %}" alt="">
+        <img src="{% static 'website/images/shape-02.svg' %}" alt="">
+    </div>
+</section>
+<!-- Category Area End -->
+
+<!-- Portfolio Area Start -->
+<section class="rts-portfolio-area rts-section-gap">
+    <div class="section-title-area2">
+        <p class="sub-title wow fadeInUp" data-wow-delay=".1s" data-wow-duration=".8s">Select Car</p>
+        <h2 class="section-title wow move-right">Our Amazing <span>Car</span></h2>
+    </div>
+    <div class="tab-area">
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="new-cars-tab" data-bs-toggle="tab" data-bs-target="#new-cars"
+                    type="button" role="tab" aria-controls="new-cars" aria-selected="true">New Cars</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="used-tab" data-bs-toggle="tab" data-bs-target="#used" type="button"
+                    role="tab" aria-controls="used" aria-selected="false">Used Cars</button>
+            </li>
+        </ul>
+    </div>
+    <div class="section-inner mt--80 wow fadeInUp" data-wow-delay=".3s" data-wow-duration="1s">
+        <div class=" tab-content" id="myTabContent">
+            <div class="tab-pane fade show active" id="new-cars" role="tabpanel" aria-labelledby="new-cars-tab">
+                <div class="slider-area">
+                    <div class="swiper projectSlider">
+                        <div class="swiper-wrapper">
+                            {% for car in new_cars %}
+                            <div class="swiper-slide">
+                                <div class="project-wrapper">
+                                    <div class="image-area">
+                                        <a href="{% url 'car_detail' car.id %}">
+                                            {% if car.thumbnail %}
+                                            <img src="{{ car.thumbnail.url }}" alt="{{ car.name }}">
+                                            {% endif %}
+                                        </a>
+                                    </div>
+                                    <span class="price">${{ car.price|floatformat:2|intcomma }}</span>
+                                    <div class="content-area">
+                                        <h5 class="title">
+                                            <a href="{% url 'car_detail' car.id %}">{{ car.name }}</a>
+                                        </h5>
+                                        <ul class="feature-area">
+                                            <li>
+                                                <img src="{% static 'website/images/01 copy.svg' %}" alt="">
+                                                {{ car.mileage }} Miles
+                                            </li>
+                                            <li>
+                                                <img src="{% static 'website/images/02_2.svg' %}" alt="">
+                                                {{ car.get_fuel_type_display }}
+                                            </li>
+                                            <li>
+                                                <img src="{% static 'website/images/03_1 copy.svg' %}" alt="">
+                                                {{ car.get_transmission_display }}
+                                            </li>
+                                        </ul>
+                                        <a href="{% url 'car_detail' car.id %}"
+                                            class="rts-btn btn-primary radius-big">View
+                                            Details</a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="swiper-slide">
+                                <p>No new cars available.</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <div class="swiper-pagination-2"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="used" role="tabpanel" aria-labelledby="used-tab">
+                <div class="slider-area">
+                    <div class="swiper projectSlider">
+                        <div class="swiper-wrapper">
+                            {% for car in used_cars %}
+                            <div class="swiper-slide">
+                                <div class="project-wrapper">
+                                    <div class="image-area">
+                                        <a href="{% url 'car_detail' car.id %}">
+                                            {% if car.thumbnail %}
+                                            <img src="{{ car.thumbnail.url }}" alt="{{ car.name }}">
+                                            {% endif %}
+                                        </a>
+                                    </div>
+                                    <span class="price">${{ car.price|floatformat:2|intcomma }}</span>
+                                    <div class="content-area">
+                                        <h5 class="title"><a href="{% url 'car_detail' car.id %}">{{ car.name }}</a>
+                                        </h5>
+                                        <ul class="feature-area">
+                                            <li>
+                                                <img src="{% static 'website/images/01 copy.svg' %}" alt="">
+                                                {{ car.mileage }} Miles
+                                            </li>
+                                            <li>
+                                                <img src="{% static 'website/images/02_2.svg' %}" alt="">
+                                                {{ car.get_fuel_type_display }}
+                                            </li>
+                                            <li>
+                                                <img src="{% static 'website/images/03_1 copy.svg' %}" alt="">
+                                                {{ car.get_transmission_display }}
+                                            </li>
+                                        </ul>
+                                        <a href="{% url 'car_detail' car.id %}"
+                                            class="rts-btn btn-primary radius-big">View
+                                            Details</a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="swiper-slide">
+                                <p>No used cars available.</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <div class="swiper-pagination-2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Portfolio Area End -->
+
+<!-- About Area Start -->
+<section class="rts-about-area rts-section-gapBottom">
+    <div class="container">
+        <div class="section-inner">
+            <div class="row align-items-center">
+                <div class="col-lg-5">
+                    <div class="about-image-area">
+                        <div class="image-main">
+                            <img class="wow scaleIn" data-wow-delay=".5s" data-wow-duration="1.5s"
+                                src="{% static 'website/images/03 copy.webp' %}" width="371" alt="">
+                            <div class="counter-area">
+                                <div class="inner wow zoomIn" data-wow-delay=".9s" data-wow-duration="1s">
+                                    <h2 class="title"><span class="counter">1000</span><span>+</span></h2>
+                                    <p class="desc">Car Sold Already</p>
+                                </div>
+                            </div>
+                        </div>
+                        <img src="{% static 'website/images/01 copy.webp' %}" alt="" width="223"
+                            class="floating-img-01 wow scaleIn" data-wow-delay=".5s" data-wow-duration="1.5s">
+                        <img src="{% static 'website/images/02 copy.webp' %}" alt="" width="266"
+                            class="floating-img-02 wow scaleIn" data-wow-delay=".5s" data-wow-duration="1.5s">
+                    </div>
+                </div>
+                <div class="col-lg-7">
+                    <div class="about-content-area">
+                        <div class="section-title-area">
+                            <p class="sub-title wow fadeInUp" data-wow-delay=".1s" data-wow-duration=".8s">
+                                About
+                                Us</p>
+                            <h2 class="section-title wow move-right">Driven by Excellence: Your Trusted
+                                Partner
+                                for Premium
+                                <span>Vehicles</span>
+                            </h2>
+                        </div>
+                        <p class="desc">Welcome to Autovault where innovation drives every journey. Discover
+                            a
+                            range
+                            of designed to elevate your driving experience.</p>
+                        <a href="{% url 'about' %}" class="rts-btn btn-primary radius-big">Learn More</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- About Area End -->
+
+<!-- Video Area Start -->
+<div class="rts-video-area bg-video-five bg_image jarallax">
+
+    <video muted="" loop="" id="myVideo">
+        <source src="{% static 'website/images/clip_1.mp4' %}">
+    </video>
+    <div class="content">
+        <button id="myBtn"></button>
+    </div>
+</div>
+<!-- Video Area End -->
+
+<!-- Brand Area Start -->
+<section class="rts-brand-area rts-section-gap">
+    <div class="container">
+        <div class="section-title-area2">
+            <p class="sub-title wow fadeInUp" data-wow-delay=".1s" data-wow-duration="1s">Car Brand</p>
+            <h2 class="section-title wow move-right">Our Premium <span>Brands</span></h2>
+        </div>
+        <div class="section-inner mt--80">
+            <ul>
+                {% for brand in brands %}
+                <li class="wow fadeInUp" data-wow-delay=".2s" data-wow-duration="1s">
+                    <img src="{{ brand.logo.url }}" alt="{{ brand.title }}">
+                </li>
+                {% empty %}
+                <li class="wow fadeInUp" data-wow-delay=".2s" data-wow-duration="1s">
+                    <h4>No Brand added yet.</h4>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</section>
+<!-- Brand Area End -->
+
+<!-- Why Choose Us Area Start -->
+<section class="rts-why-choose-us">
+    <div class="right-image jarallax jara-mask-1">
+        <img src="{% static 'website/images/why-choose-bg.webp' %}" width="886" class="jarallax-img" alt="">
+    </div>
+    <div class="container">
+        <div class="section-inner">
+            <div class="row justify-content-end">
+                <div class="col-lg-6">
+                    <div class="content-area">
+                        <div class="section-title-area">
+                            <p class="sub-title wow fadeInUp" data-wow-delay=".1s" data-wow-duration=".8s">
+                                Why
+                                Choose Us</p>
+                            <h2 class="section-title cw wow move-right">Why Choose
+                                <span>Us</span>
+                            </h2>
+                        </div>
+                        <ul class="why-choose-feature-list mt--60">
+                            <li class="wow fadeInUp" data-wow-delay=".2s" data-wow-duration="1s">
+                                <div class="icon"><img src="{% static 'website/images/icon-01 copy 2.svg' %}" alt=""></div>
+                                <div class="content">
+                                    <h6 class="title cw">Competitive Pricing</h6>
+                                    <p class="desc">Whether you're looking for a brand-new model or a
+                                        certified
+                                        pre-owned vehicle, we have a diverse.</p>
+                                </div>
+                            </li>
+                            <li class="wow fadeInUp" data-wow-delay=".4s" data-wow-duration="1s">
+                                <div class="icon"><img src="{% static 'website/images/icon-02 copy 2.svg' %}" alt=""></div>
+                                <div class="content">
+                                    <h6 class="title cw">24 Hour Support</h6>
+                                    <p class="desc">Whether you're looking for a brand-new model or a
+                                        certified
+                                        pre-owned vehicle, we have a diverse.</p>
+                                </div>
+                            </li>
+                            <li class="wow fadeInUp" data-wow-delay=".6s" data-wow-duration="1s">
+                                <div class="icon"><img src="{% static 'website/images/icon-03 copy 2.svg' %}" alt=""></div>
+                                <div class="content">
+                                    <h6 class="title cw">GPS on Every Vehicle</h6>
+                                    <p class="desc">Whether you're looking for a brand-new model or a
+                                        certified
+                                        pre-owned vehicle, we have a diverse.</p>
+                                </div>
+                            </li>
+                            <li class="wow fadeInUp" data-wow-delay=".8s" data-wow-duration="1s">
+                                <div class="icon"><img src="{% static 'website/images/icon-04 copy.svg' %}" alt=""></div>
+                                <div class="content">
+                                    <h6 class="title cw">Expert Maintenance</h6>
+                                    <p class="desc">Whether you're looking for a brand-new model or a
+                                        certified
+                                        pre-owned vehicle, we have a diverse.</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Why Choose Us Area End -->
+
+<!-- Feature Area Start -->
+<section class="rts-feature-area rts-section-gap">
+    <div class="container">
+        <div class="section-title-area2">
+            <p class="sub-title wow fadeInUp" data-wow-delay=".1s" data-wow-duration=".8s">Featured Car</p>
+            <h2 class="section-title wow move-right">Our Featured <span>Car</span></h2>
+        </div>
+        <div class="slider-area mt--80 wow fadeInUp" data-wow-delay=".3s" data-wow-duration="1s">
+            <div class="swiper featureSlider">
+                <div class="swiper-wrapper">
+                    {% for car in featured_cars %}
+                    <div class="swiper-slide">
+                        <div class="feature-wrapper">
+                            <div class="image-area">
+                                {% if car.thumbnail %}
+                                <img src="{{ car.thumbnail.url }}"  alt="{{ car.name }}">
+                                {% endif %}
+                            </div>
+                            <div class="content-area">
+                                <span class="dot"></span>
+                                <h6 class="title"><a href="{% url 'car_detail' car.id %}" class="text-capitalize">{{ car.name }}</a></h6>
+                                <ul class="feature-area">
+                                    <li>
+                                        <img src="{% static 'website/images/01 copy.svg' %}" alt="">
+                                        {{ car.mileage }} Miles
+                                    </li>
+                                    <li>
+                                        <img src="{% static 'website/images/03_1 copy.svg' %}" alt="">
+                                        {{ car.get_transmission_display }}
+                                    </li>
+                                    <li>
+                                        <img src="{% static 'website/images/02_2.svg' %}" alt="">
+                                        {{ car.get_fuel_type_display }}
+                                    </li>
+                                </ul>
+                                <a href="{% url 'car_detail' car.id %}" class="rts-btn radius-big">View
+                                    Details</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="swiper-slide">
+                        <p>No featured cars available.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+            </div>
+            <div class="swiper-pagination-3"></div>
+        </div>
+    </div>
+</section>
+<!-- Feature Area End -->
+
+
+<!-- Blog Area Start -->
+<section class="rts-blog-area rts-section-gapTop">
+    <div class="container">
+        <div class="section-inner">
+            <div class="row align-items-center">
+                <div class="col-xl-4">
+                    <div class="left-side-content">
+                        <div class="section-title-area">
+                            <p class="sub-title wow fadeInUp" data-wow-delay=".1s" data-wow-duration=".8s">
+                                Latest Blog</p>
+                            <h2 class="section-title wow move-right">Our Latest <span>Blog</span></h2>
+                        </div>
+                        <p class="desc wow fadeIn" data-wow-delay=".3s" data-wow-duration="1s">Welcome to
+                            Autovault where innovation drives every journey. Discover a range of designed to
+                            elevate your driving experience.</p>
+                        <a href="{% url 'blog' %}" class="text-btn wow fadeIn" data-wow-delay=".5s" data-wow-duration="1s">Read
+                            All Blog</a>
+                    </div>
+                </div>
+                <div class="col-xl-8">
+                    <div class="right-side-blog wow fadeInRight" data-wow-delay=".6s" data-wow-duration="1s">
+                        <div class="row g-5">
+                            {% for blog in blogs %}
+                            <div class="col-lg-6">
+                                <div class="blog-wrapper">
+
+                                    <div class="image-area">
+                                        <a href="{% url 'blog_detail' blog.id %}">
+                                            {% if blog.thumbnail %}
+                                            <img src="{{ blog.thumbnail.url }}" alt="{{ blog.title }}">
+                                            {% endif %}
+                                        </a>
+                                    </div>
+
+                                    <div class="content">
+                                        <p class="blog-meta">{{ blog.created_at|naturaltime }}</p>
+                                        <h6><a href="{% url 'blog_detail' blog.id %}" class="text-capitalize">{{ blog.title }}</a></h6>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            {% empty %}
+                            <div class="col-12">
+                                <p>No blogs available.</p>
+                            </div>
+                            {% endfor %}
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Blog Area End -->
+
+
+{% endblock body %}

@@ -1,0 +1,253 @@
+{% extends 'website/components/base.html' %}
+
+{% load static %}
+
+{% block body %}
+
+<!-- Breadcrumb area start -->
+<!-- rts breadcrumb area start -->
+<div class="rts-breadcrumb-area service jarallax">
+    <div class="container">
+        <div class="breadcrumb-area-wrapper">
+            <h1 class="title">About</h1>
+            <div class="nav-bread-crumb">
+                <a href="{% url 'home' %}">Home</a>
+                <a href="#" class="current">About</a>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- rts breadcrumb area end -->
+<!-- Breadcrumb area end -->
+<!-- About Area Start -->
+<section class="rts-about-area inner two rts-section-gapTop">
+    <div class="container">
+        <div class="section-inner">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <div class="about-image-area-two">
+                        <div class="left wow scaleIn" data-wow-delay=".5s" data-wow-duration="1s">
+                            <img src="{% static 'website/images/12 copy.webp' %}" width="339" alt="">
+                        </div>
+                        <div class="right wow scaleIn" data-wow-delay=".5s" data-wow-duration="1s">
+                            <img src="{% static 'website/images/13.webp' %}" width="280" alt="">
+                            <div class="counter-area">
+                                <h2 class="title"><span class="counter">1000</span><span>+</span></h2>
+                                <p class="desc">Car Sold Already</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="about-content-area">
+                        <div class="section-title-area">
+                            <p class="sub-title wow fadeInUp" data-wow-delay=".1s" data-wow-duration="1s">About
+                                Us</p>
+                            <h2 class="section-title wow move-right">Driven by Excellence: Your Trusted Partner for
+                                Premium
+                                <span>Vehicles</span>
+                            </h2>
+                        </div>
+                        <p class="desc wow fadeInUp" data-wow-delay=".4s" data-wow-duration="1s">Welcome to
+                            AG-Enterprise
+                            where innovation drives every journey. Discover a
+                            range
+                            of designed to elevate your driving experience.</p>
+                        <a href="call-to:+959986234418" class="rts-btn call-btn wow fadeInUp" data-wow-delay=".6s"
+                            data-wow-duration="1s">
+                            <span>
+                                <i class="fa-regular fa-phone"></i>
+                            </span>
+                            <div class="content">
+                                <h6>Call Us Now</h6>
+                                <p>+959-671683862</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="bg-shape-area">
+        <img src="{% static 'website/images/shape-01.svg' %}" alt="">
+        <img src="{% static 'website/images/shape-02.svg' %}" alt="">
+    </div>
+</section>
+<!-- About Area End -->
+<!-- Counter Area Start -->
+<section class="rts-counter-area-two">
+    <div class="container">
+        <div class="counter-inner">
+            <div class="inner wow zoomIn" data-wow-delay=".2s" data-wow-duration="1s">
+                <div class="icon">
+                    <img src="{% static 'website/images/icon-01.svg' %}" width="74" alt="">
+                </div>
+                <div class="text">
+                    <h3 class="title"><span class="counter">{{ cars_count }}</span></h3>
+                    <p class="desc">Cars For Sale</p>
+                </div>
+            </div>
+            <div class="inner wow zoomIn" data-wow-delay=".4s" data-wow-duration="1s">
+                <div class="icon">
+                    <img src="{% static 'website/images/icon-02.svg' %}" alt="">
+                </div>
+                <div class="text">
+                    <h3 class="title"><span class="counter">{{ review_count }}</span><span>+</span></h3>
+                    <p class="desc">Dealer Review</p>
+                </div>
+            </div>
+            <div class="inner wow zoomIn" data-wow-delay=".6s" data-wow-duration="1s">
+                <div class="icon">
+                    <img src="{% static 'website/images/icon-03.svg' %}" alt="">
+                </div>
+                <div class="text">
+                    <h3 class="title"><span class="counter">{{ user_count }}</span><span>+</span></h3>
+                    <p class="desc">Verified User</p>
+                </div>
+            </div>
+            <div class="inner wow zoomIn" data-wow-delay=".8s" data-wow-duration="1s">
+                <div class="icon">
+                    <img src="{% static 'website/images/icon-04.svg' %}" alt="">
+                </div>
+                <div class="text">
+                    <h3 class="title"><span class="counter">10</span><span>M</span></h3>
+                    <p class="desc">Visitor Per Day</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Counter Area End -->
+<!-- Testimonials Area Start -->
+<section class="rts-testimonials-area area-2 rts-section-gap">
+    <div class="bg-shape-area">
+    </div>
+    <div class="shape wow slideInLeft" data-wow-delay=".5s" data-wow-duration="2s">
+        <img src="{% static 'website/images/03_1.webp' %}" width="1107" alt="">
+    </div>
+    <div class="container">
+        <div class="section-inner">
+            <div class="row align-items-center justify-content-end">
+                <div class="col-xl-5">
+                    <div class="section-title-area">
+                        <p class="sub-title wow fadeInUp" data-wow-delay=".1s" data-wow-duration=".8s">by AG-Enterprise</p>
+                        <h2 class="section-title wow move-right">What we <span>assure</span> you:
+                        </h2>
+                    </div>
+                    <div class="slider-inner mt--50">
+                        <div class="swiper testimonialSlider">
+                            <div class="swiper-wrapper">
+                                
+                                <div class="swiper-slide">
+                                    <div class="review-wrapper">
+                                        <p class="desc">
+                                            At AG-Enterprise, your trust is our priority. We are committed to providing quality vehicles, transparent information, and a smooth buying experience. From your first inquiry to driving away in your dream car, we strive to make every step simple, honest, and satisfying.
+                                        </p>
+                                        <div class="author-area d-flex align-items-center">
+                                            <div class="text">
+                                                <p class="designation">Since 2003</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="swiper-pagination-4"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Testimonials Area End -->
+<!-- Team Area Start -->
+<section class="rts-team-area rts-section-gap">
+    <div class="container">
+        <div class="section-title-area2">
+            <p class="sub-title wow fadeInUp" data-wow-delay=".1s" data-wow-duration="1s">Our Team</p>
+            <h2 class="section-title wow move-right">Let’s Meet Our <span>Expert</span></h2>
+        </div>
+        <div class="section-inner mt--60">
+            <div class="row g-5">
+                <div class="col-lg-3 col-md-6">
+                    <div class="team-wrapper">
+                        <div class="image-area">
+                            <a href="#">
+                                <img src="{% static 'website/images/01 copy 2.webp' %}" alt="">
+                            </a>
+                            <div class="content">
+                                <h6 class="title cw">Amelia Scot</h6>
+                                <p class="designation cw">Office Executive</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="team-wrapper">
+                        <div class="image-area">
+                            <a href="#">
+                                <img src="{% static 'website/images/02 copy 2.webp' %}" alt="">
+                            </a>
+                            <div class="content">
+                                <h6 class="title cw">Michael Roy</h6>
+                                <p class="designation cw">Manager</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="team-wrapper">
+                        <div class="image-area">
+                            <a href="#">
+                                <img src="{% static 'website/images/03.webp' %}" alt="">
+                            </a>
+                            <div class="content">
+                                <h6 class="title cw">Emma Elizabeth</h6>
+                                <p class="designation cw">Office Executive</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="team-wrapper">
+                        <div class="image-area">
+                            <a href="#">
+                                <img src="{% static 'website/images/04 copy.webp' %}" alt="">
+                            </a>
+                            <div class="content">
+                                <h6 class="title cw">Michael Roy</h6>
+                                <p class="designation cw">Manager</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Team Area End -->
+<!-- Brand Area Start -->
+<section class="rts-brand-area">
+    <div class="container">
+        <div class="section-title-area2">
+            <p class="sub-title wow fadeInUp" data-wow-delay=".1s" data-wow-duration="1s">Partners</p>
+            <h2 class="section-title wow move-right">Browse by <span>Company</span></h2>
+        </div>
+        <div class="section-inner mt--80">
+            <ul>
+                {% for brand in brands %}
+                <li class="wow fadeInUp" data-wow-delay=".2s" data-wow-duration="1s"><img src="{{ brand.logo.url }}" alt="{{ brand.title }}">
+                </li>
+                {% empty %}
+                <li class="wow fadeInUp" data-wow-delay=".2s" data-wow-duration="1s">
+                    <p>No Brand added yet.</p>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</section>
+<!-- Brand Area End -->
+
+
+{% endblock body %}

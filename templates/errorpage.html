@@ -1,0 +1,66 @@
+{% load static %}
+
+<!doctype html>
+<html lang="en" class="error-page-document">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="AG-Enterprise access denied page">
+    <title>403 — Access Denied | AG-Enterprise</title>
+    <link rel="stylesheet" href="{% static 'errorpage/style.css' %}">
+    <link rel="stylesheet" href="{% static 'website/fontawesome/css/all.min.css' %}">
+</head>
+
+<body class="error-page-document">
+    <main class="error-page" aria-labelledby="error-page-title">
+        <div class="error-page__glow error-page__glow--top" aria-hidden="true"></div>
+        <div class="error-page__glow error-page__glow--bottom" aria-hidden="true"></div>
+
+        <header class="error-page__brand" aria-label="AG-Enterprise">
+            <span class="error-page__brand-mark" aria-hidden="true"><img src="{% static 'website/images/logo.png' %}" alt=""></span>
+            <span class="error-page__brand-name">AG-Enterprise</span>
+        </header>
+
+        <section class="error-page__content">
+            <p class="error-page__eyebrow"><span aria-hidden="true"></span>Access Denied</p>
+            <div class="error-page__code" aria-hidden="true">403</div>
+            <h1 class="error-page__title" id="error-page-title"> Forbidden </h1>
+            <p class="error-page__message">Sorry,You don't have permission to access this page.No matter how hard You
+                try, You will never find <span style="text-decoration: underline; color: #000;">her</span> again.Just
+                Give up and Move on....</p>
+            <a href="{% if request.user.is_staff or request.user.is_superuser %}{% url 'dashboard' %}{% else %}{% url 'home' %}{% endif %}" class="rts-btn btn-primary error-page__back-btn" id="errorPageBackButton">
+                <span class="error-page__back-text">
+                    <span class="back-text-her">Back to Her</span>
+                    <span class="back-text-home">Back to Home</span>
+                </span>
+
+                <span class="error-page__back-icon" aria-hidden="true">
+                    <i class="fa-solid fa-house home-icon"></i>
+                    <i class="fa-solid fa-heart heart-icon"></i>
+                </span>
+
+                <span class="error-page__loading-spinner" aria-hidden="true"></span>
+            </a>
+
+            <audio id="errorPageAudio" preload="auto" src="{% static 'errorpage/errorpage.mp3' %}"></audio>
+
+            <p class="error-page__footer"><span style="color: #ff3600; font-weight: bold;">AG-Enterprise</span><span
+                    aria-hidden="true">·</span> Drive with confidence <i class="fa-solid fa-exclamation"></i></p>
+
+            <div class="error-page__toast-container" aria-live="polite" aria-atomic="true">
+                <div class="error-page__toast error-page__toast--warning" id="errorPageToast" role="alert">
+                    <span class="error-page__toast-icon" aria-hidden="true"><i
+                            class="fa-solid fa-triangle-exclamation"></i></span>
+                    <span class="error-page__toast-content">
+                        <strong class="error-page__toast-title">Access Denied</strong>
+                        <span class="error-page__toast-message">You don't have permission to access this page.</span>
+                    </span>
+                </div>
+            </div>
+    </main>
+
+    <script src="{% static 'errorpage/main.js' %}"></script>
+</body>
+
+</html>

@@ -1,0 +1,145 @@
+{% extends 'website/components/base.html' %}
+
+{% load static %}
+
+{% block body %}
+
+<!-- Breadcrumb area start -->
+<!-- rts breadcrumb area start -->
+<div class="rts-breadcrumb-area portfolio jarallax">
+    <div class="container">
+        <div class="breadcrumb-area-wrapper">
+            <h1 class="title">Blog</h1>
+            <div class="nav-bread-crumb">
+                <a href="{% url 'home' %}">Home</a>
+                <a href="#" class="current">Blog</a>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- rts breadcrumb area end -->
+<!-- Breadcrumb area end -->
+<div class="rts-blog-area inner rts-section-gapTop">
+    <div class="container">
+        <div class="row g-5">
+            <div class="col-lg-8">
+                <div class="left">
+                    {% if request.GET.search %}
+                    <div class="text-center mb-4">
+                        <a href="{% url 'blog' %}" class="rts-btn radius-big icon btn-primary">
+                            View All Blogs
+                        </a>
+                    </div>
+                    {% endif %}
+                    <div class="row g-5">
+                        {% for blog in blogs %}
+                        <div class="col-lg-6">
+                            <div class="blog-wrapper">
+                                <div class="image-area">
+                                    <a href="{% url 'blog_detail' blog.id %}"><img src="{{ blog.thumbnail.url }}"
+                                            alt="{{ blog.title }}"></a>
+                                </div>
+                                <div class="content">
+
+                                    <p class="blog-meta">AG-Enterprise's Event</p>
+                                    <h6><a href="{% url 'blog_detail' blog.id %}">{{ blog.title }}</a></h6>
+                                    <div class="author-date">
+                                        <div class="date">{{ blog.created_at }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="col-lg-6">
+                            <h6>No Blog yet.</h6>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% with search=request.GET.search %}
+
+                {% if blogs.has_other_pages %}
+                <div class="rts-pagination">
+
+                    {% if blogs.has_previous %}
+                    <a href="?search={{ search|default:''|urlencode }}&page={{ blogs.previous_page_number }}"
+                        class="rts-pagination-btn pagination-arrow">
+                        <i class="fa-regular fa-arrow-left"></i>
+                    </a>
+                    {% endif %}
+
+                    {% for num in blogs.paginator.page_range %}
+
+                    {% if blogs.number == num %}
+                    <span class="rts-pagination-btn active">
+                        {{ num }}
+                    </span>
+                    {% else %}
+                    <a href="?search={{ search|default:''|urlencode }}&page={{ num }}" class="rts-pagination-btn">
+                        {{ num }}
+                    </a>
+                    {% endif %}
+
+                    {% endfor %}
+
+                    {% if blogs.has_next %}
+                    <a href="?search={{ search|default:''|urlencode }}&page={{ blogs.next_page_number }}"
+                        class="rts-pagination-btn pagination-arrow">
+                        <i class="fa-regular fa-arrow-right"></i>
+                    </a>
+                    {% endif %}
+
+                </div>
+                {% endif %}
+
+                {% endwith %}
+            </div>
+            <div class="col-lg-4">
+                <div class="sticky-top">
+                    <div class="right-side-bar">
+                        <div class="search-area side-box">
+                            <h2>blogs Search</h2>
+                            <form action="{% url 'blog' %}" method="get">
+                                <div class="input-wrapper">
+                                    <input type="text" name="search" value="{{ request.GET.search|default:'' }}"
+                                        placeholder="Search Blogs" required="">
+                                    <button type="submit"><i class="fa-regular fa-magnifying-glass"></i></button>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="recent-post side-box">
+                            <h2>Recent Post</h2>
+                            <ul class="blog-list">
+                                {% for recent_blog in recent_blogs %}
+                                <li>
+                                    <div class="image-area">
+                                        <a href="{% url 'blog_detail' recent_blog.id %}">
+                                            <img src="{{ recent_blog.thumbnail.url }}" width="100"
+                                                alt="{{ recent_blog.title }}">
+                                        </a>
+                                    </div>
+                                    <div class="content">
+                                        <h6><a href="{% url 'blog_detail' recent_blog.id %}">{{ recent_blog.title }}</a>
+                                        </h6>
+                                        <p class="blog-meta">{{ recent_blog.created_at }}</p>
+                                    </div>
+                                </li>
+                                {% empty %}
+                                <li>
+                                    <p>No blog added recently.</p>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <div class="ad-area">
+                            <img src="{% static 'website/images/ad.webp' %}" alt="">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock body %}

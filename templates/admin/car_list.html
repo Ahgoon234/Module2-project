@@ -1,0 +1,372 @@
+{% extends 'admin/components/base.html' %}
+
+{% load static %}
+{% load humanize %}
+
+{% block body %}
+
+<main class="admin-content" id="adminContent">
+    <section class="dashboard-card dashboard-card--table">
+        <div class="dashboard-card-header">
+            <h3 class="dashboard-card-title">All Cars</h3>
+            {% if perms.lore.add_carmodel %}
+            <a href="#" class="quick-action-btn" data-admin-action="create" data-admin-module="car">
+                <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                Add Car
+                <i class="fa-solid fa-car" aria-hidden="true"></i>
+            </a>
+            {% endif %}
+        </div>
+
+
+        <!-- Search Form -->
+        <form method="get" action="{% url 'car_list' %}" class="car-filter-search">
+            <input type="search" name="search" placeholder="Search car name..." value="{{ request.GET.search|default:'' }}">
+
+            <button type="submit" class="car-filter-submit">
+                <i class="fas fa-search"></i> Search
+            </button>
+        </form>
+
+        <!-- Filter Form -->
+        <form method="get" action="{% url 'car_list' %}" class="car-filter-panel">
+
+            <select name="brand" class="car-filter-select">
+                <option value="">All Brands</option>
+                {% for brand in brands %}
+                <option value="{{ brand.id }}" {% if request.GET.brand == brand.id|stringformat:"s" %}selected{% endif %}>
+                    {{ brand.title }}
+                </option>
+                {% endfor %}
+            </select>
+
+            <select name="category" class="car-filter-select">
+                <option value="">All Categories</option>
+                {% for category in categories %}
+                <option value="{{ category.id }}" {% if request.GET.category == category.id|stringformat:"s" %}selected{% endif %}>
+                    {{ category.name }}
+                </option>
+                {% endfor %}
+            </select>
+
+            <select name="condition" class="car-filter-select">
+                <option value="">All Conditions</option>
+                {% for value, label in condition_choices %}
+                <option value="{{ value }}" {% if request.GET.condition == value %}selected{% endif %}>
+                    {{ label }}
+                </option>
+                {% endfor %}
+            </select>
+
+            <button type="submit" class="car-filter-submit">
+                <i class="fas fa-filter"></i> Apply Filters
+            </button>
+            {% if request.GET.search or request.GET.brand or request.GET.category or request.GET.condition %}
+            <a href="{% url 'car_list' %}" class="car-filter-clear">
+                Clear
+            </a>
+            {% endif %}
+        </form>
+
+
+        <div class="table-responsive">
+            <table class="admin-table admin-table--wide">
+                <thead>
+                    <tr>
+                        <th>Car</th>
+                        <th>Brand</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Year</th>
+                        <th>Fuel Type</th>
+                        <th>Condition</th>
+                        <th>Featured</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for car in cars %}
+                    <tr data-car-id="{{ car.id }}" data-name="{{ car.name }}" data-brand="{{ car.brand.id }}"
+                        data-category="{% if car.category %}{{ car.category.id }}{% endif %}"
+                        data-price="{{ car.price }}" data-stock="{{ car.stock }}" data-year="{{ car.year }}"
+                        data-mileage="{{ car.mileage }}" data-color="{{ car.color }}"
+                        data-fuel-type="{{ car.fuel_type }}" data-transmission="{{ car.transmission }}"
+                        data-engine="{{ car.engine }}" data-horsepower="{{ car.horsepower }}"
+                        data-description="{{ car.description|default:'' }}" data-condition="{{ car.condition }}"
+                        data-featured="{{ car.is_featured|yesno:'true,false' }}"
+                        data-thumbnail="{{ car.thumbnail.url }}" data-gallery='[
+                            {% for image in car.images.all %}
+                            {
+                                "id": "{{ image.id }}",
+                                "src": "{{ image.image.url }}"
+                            }{% if not forloop.last %},{% endif %}
+                            {% endfor %}
+                        ]'>
+                        <td data-label="Car">
+                            <div class="table-car">
+                                {% if car.thumbnail %}
+                                <img src="{{ car.thumbnail.url }}" class="car_img" alt="{{ car.name }}">
+                                {% else %}
+                                <div class="car_img">
+                                    <i class="fa-solid fa-image"></i>
+                                </div>
+                                {% endif %}
+
+                                {{ car.name }}
+                            </div>
+                        </td>
+                        <td data-label="Brand">{{ car.brand.title }}</td>
+                        <td data-label="Category">{{ car.category.name }}</td>
+                        <td data-label="Price">{{ car.price|floatformat:2|intcomma }}</td>
+                        <td data-label="Year">{{ car.year }}</td>
+                        <td data-label="Fuel Type">{{ car.get_fuel_type_display }}</td>
+                        <td data-label="Condition">
+                            {% if car.condition == 'new' %}
+                            <span class="status-badge status-badge--available">{{ car.get_condition_display }}</span>
+                            {% else %}
+                            <span class="status-badge status-badge--sold">{{ car.get_condition_display }}</span>
+                            {% endif %}
+                        </td>
+                        <td data-label="Featured">
+                            {% if car.is_featured %}
+                            <span class="status-badge status-badge--featured">Featured</span>
+                            {% else %}
+                            <span class="status-badge status-badge--muted">Normal</span>
+                            {% endif %}
+                        </td>
+                        <td data-label="Actions">
+                            <div class="table-actions">
+                                <a href="#" class="table-action-btn" aria-label="View" data-admin-action="view"
+                                    data-admin-module="car"> <i class="fa-solid fa-eye" aria-hidden="true"></i></a>
+                                {% if perms.lore.change_carmodel %}
+                                <a href="#" class="table-action-btn" aria-label="Edit" data-admin-action="edit"
+                                    data-admin-module="car"><i class="fa-solid fa-pen" aria-hidden="true"></i></a>
+                                {% endif %}
+
+                                {% if perms.lore.delete_carmodel %}
+                                <a href="{% url 'car_delete' car.id %}"
+                                    class="table-action-btn table-action-btn--danger" data-delete-trigger
+                                    data-delete-name="{{ car.name }}" data-delete-id="{{ car.id }}"
+                                    aria-label="Delete {{ car.name }}"><i class="fa-solid fa-trash"
+                                        aria-hidden="true"></i></a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="11">No Car found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+
+{% endblock body %}
+
+{% block form %}
+
+<div class="admin-modal" id="carModal" data-admin-modal data-admin-module="car" aria-hidden="true">
+    <div class="admin-modal-backdrop" data-modal-close></div>
+    <section class="admin-modal-dialog admin-modal-dialog--large" role="dialog" aria-modal="true"
+        aria-labelledby="carModalTitle">
+        <div class="admin-modal-header">
+            <div><span class="admin-modal-kicker">Car Details Form</span>
+                <h2 class="admin-modal-title" id="carModalTitle" data-modal-title>Add New Car</h2>
+                <p class="admin-modal-subtitle" data-modal-subtitle>Enter the details below to add a new car.</p>
+            </div>
+            <button type="button" class="admin-modal-close" data-modal-close aria-label="Close car form"><i
+                    class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+        </div>
+        <form method="post" action="{% url 'car_create' %}" data-create-url="{% url 'car_create' %}"
+            data-update-base-url="{% url 'car_update' '00000000-0000-0000-0000-000000000000' %}"
+            enctype="multipart/form-data" id="carForm" class="admin-modal-form" data-modal-form novalidate>
+            {% csrf_token %}
+            <div class="admin-modal-body">
+                <div class="admin-form-grid">
+                    <div class="admin-field">
+                        <label>Name</label>
+                        <input type="text" id="carName" name="name" required placeholder="e.g. BMW M4 Competition">
+                    </div>
+                    <div class="admin-field">
+                        <label>Brand</label>
+                        <select id="carBrand" name="brand" required>
+                            <option value="">Select an option</option>
+
+                            {% for brand in brands %}
+                            <option value="{{ brand.id }}">{{ brand.title }}</option>
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+                    <div class="admin-field">
+                        <label>Category</label>
+                        <select id="carCategory" name="category" required>
+                            <option value="">Select an option</option>
+
+                            {% for category in categories %}
+                            <option value="{{ category.id }}">{{ category.name }}</option>
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+                    <div class="admin-field">
+                        <label>Condition</label>
+                        <select id="carCondition" name="condition" required>
+
+                            {% for value,label in condition_choices %}
+                            <option value="{{ value }}">{{ label }}</option>
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+                    <div class="admin-field">
+
+                        <label>Price</label>
+                        <input type="number" id="carPrice" name="price" min="0.01" step="0.01" required
+                            placeholder="0.00">
+
+                    </div>
+
+                    <div class="admin-field">
+
+                        <label>Stock</label>
+                        <input type="number" id="carStock" name="stock" min="1" step="1" required placeholder="0">
+
+                    </div>
+
+                    <div class="admin-field">
+
+                        <label>Year</label>
+                        <input type="number" id="carYear" name="year" min="1000" max="3000" step="1" required
+                            placeholder="2026">
+
+                    </div>
+
+                    <div class="admin-field">
+
+                        <label>Mileage</label>
+                        <input type="number" id="carMileage" name="mileage" min="0" step="1" required placeholder="0">
+
+                    </div>
+
+                    <div class="admin-field">
+
+                        <label>Color</label>
+                        <input type="text" id="carColor" name="color" required placeholder="Obsidian Black">
+
+                    </div>
+                    <div class="admin-field">
+                        <label>Fuel Type</label>
+                        <select id="carFuelType" name="fuel_type" required>
+
+                            {% for value,label in fuel_choices %}
+                            <option value="{{ value }}">{{ label }}</option>
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+                    <div class="admin-field">
+                        <label>Transmission</label>
+                        <select id="carTransmission" name="transmission" required>
+
+                            {% for value,label in transmission_choices %}
+                            <option value="{{ value }}">{{ label }}</option>
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+                    <div class="admin-field">
+
+                        <label>Engine</label>
+                        <input type="text" id="carEngine" name="engine" required placeholder="2.0L Turbocharged">
+
+                    </div>
+                    <div class="admin-field">
+
+                        <label>Horsepower</label>
+                        <input type="number" id="carHorsepower" name="horsepower" required placeholder="0">
+
+                    </div>
+
+                    <div class="admin-field admin-field--full">
+
+                        <label>Description</label>
+                        <textarea id="carDescription" name="description" rows="4" required
+                            placeholder="Add a short description of the vehicle"></textarea>
+
+                    </div>
+
+                    <div class="admin-field">
+                        <label>Thumbnail</label>
+                        <div class="admin-image-upload">
+                            <input type="file" id="carThumbnail" name="thumbnail" accept="image/webp" data-image-input
+                                data-preview-target="carThumbnailPreview">
+                            <label class="admin-upload-control" for="carThumbnail">
+                                <span class="admin-upload-icon"><i class="fa-solid fa-cloud-arrow-up"
+                                        aria-hidden="true"></i></span>
+                                <span class="admin-upload-copy"><strong>Car thumbnail</strong><small
+                                        data-upload-label>Choose image</small></span>
+                            </label>
+                            <div class="admin-single-preview" id="carThumbnailPreview" data-single-preview hidden>
+                                <img src="" alt="Car thumbnail preview" data-single-preview-image>
+                                <div class="admin-single-preview-copy"><strong data-preview-name>No image
+                                        selected</strong><small>Preview only</small></div>
+                                <button type="button" class="admin-image-clear" data-clear-single
+                                    data-input-id="carThumbnail" aria-label="Remove selected car thumbnail"><i
+                                        class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="admin-field admin-field--checkbox">
+                        <span class="admin-field-label">Visibility</span>
+                        <label class="admin-checkbox"><input type="checkbox" id="carIsFeatured" name="is_featured"><span
+                                class="admin-checkbox-box"><i class="fa-solid fa-check"
+                                    aria-hidden="true"></i></span><span>Is Featured</span></label>
+                    </div>
+                    <div class="admin-form-section admin-field--full">
+                        <div class="admin-form-section-heading">
+                            <div><span class="admin-field-label">Gallery Images</span><small>Additional images for the
+                                    vehicle gallery</small></div><span class="admin-section-badge">Multiple</span>
+                        </div>
+                        <div class="admin-gallery-upload">
+                            <input type="file" id="carGallery" name="gallery_images" accept="image/webp" multiple
+                                data-gallery-input>
+                            <label class="admin-upload-control admin-upload-control--gallery" for="carGallery"><span
+                                    class="admin-upload-icon"><i class="fa-solid fa-images"
+                                        aria-hidden="true"></i></span><span class="admin-upload-copy"><strong>Choose
+                                        gallery images</strong><small>Add more images at any
+                                        time</small></span><span class="admin-upload-action">Browse</span></label>
+                        </div>
+                        <div class="admin-gallery-preview" data-gallery-preview aria-live="polite">
+                            <div class="admin-gallery-empty">No gallery images selected yet.</div>
+                        </div>
+                        <div id="carDeletedImages" data-deleted-images></div>
+                    </div>
+                </div>
+            </div>
+            <div class="admin-modal-footer"><span class="admin-modal-disclaimer text-danger">Please double-check your
+                    details before
+                    submitting. Any mistakes may affect data accuracy and will be considered a performance issue.</span>
+                <div class="admin-modal-actions">
+                    <button type="button" class="ag-btn ag-btn-secondary" data-modal-close>Cancel</button>
+                    <button type="submit" class="ag-btn ag-btn-primary" data-submit-button>Create Car</button>
+                </div>
+            </div>
+        </form>
+    </section>
+</div>
+
+{% endblock form %}

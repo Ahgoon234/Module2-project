@@ -1,0 +1,770 @@
+{% load static %}
+
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#05070c">
+  <title>AG-Enterprise | Verify Access</title>
+  <link rel="stylesheet" href="{% static 'website/css/toast.css' %}">
+  <style>
+    :root {
+      --primary: #FF3600;
+      --primary-bright: #ff7b4d;
+      --violet: #7b61ff;
+      --blue: #4cc9ff;
+      --ink: #060913;
+      --ink-2: #0b1020;
+      --ink-3: #11182b;
+      --muted: #697386;
+      --line: rgba(255, 255, 255, .1);
+      --transition: all .3s ease-in-out
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    html,
+    body {
+      width: 100%;
+      min-height: 100%
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      overflow: auto;
+      font-family: Inter, Arial, sans-serif;
+      color: var(--ink);
+      background: radial-gradient(circle at 10% 18%, rgba(255, 54, 0, .18), transparent 22%), radial-gradient(circle at 79% 16%, rgba(123, 97, 255, .18), transparent 24%), radial-gradient(circle at 88% 82%, rgba(76, 201, 255, .12), transparent 25%), linear-gradient(135deg, #02030a 0%, #070b18 46%, #03050d 100%)
+    }
+
+    button,
+    input {
+      font: inherit
+    }
+
+    button {
+      cursor: pointer
+    }
+
+    .page {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      position: relative;
+      isolation: isolate;
+      padding: 28px;
+      overflow: hidden
+    }
+
+    .page:before {
+      content: "";
+      position: absolute;
+      inset: 8% 5%;
+      pointer-events: none;
+      background: radial-gradient(circle at 12% 28%, #fff 0 1px, transparent 1.5px), radial-gradient(circle at 22% 65%, rgba(123, 97, 255, .8) 0 1px, transparent 1.6px), radial-gradient(circle at 84% 34%, rgba(255, 54, 0, .82) 0 1px, transparent 1.6px);
+      opacity: .48;
+      z-index: -1
+    }
+
+    .grid,
+    .noise,
+    .scanline,
+    .hud-ring,
+    .light-streak {
+      position: absolute;
+      pointer-events: none
+    }
+
+    .grid {
+      inset: 0;
+      opacity: .23;
+      background-image: radial-gradient(circle, rgba(255, 255, 255, .82) 0 1px, transparent 1.5px), linear-gradient(rgba(255, 255, 255, .024) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, .024) 1px, transparent 1px);
+      background-size: 140px 140px, 56px 56px, 56px 56px;
+      mask-image: radial-gradient(circle at center, #000 28%, transparent 92%);
+      z-index: -4
+    }
+
+    .noise {
+      inset: 0;
+      opacity: .035;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.65'/%3E%3C/svg%3E");
+      z-index: -5
+    }
+
+    .scanline {
+      left: 0;
+      right: 0;
+      top: 22%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255, 54, 0, .55), transparent);
+      box-shadow: 0 0 24px rgba(255, 54, 0, .22);
+      animation: sweep 7s ease-in-out infinite;
+      z-index: -2
+    }
+
+    .hud-ring {
+      width: 520px;
+      height: 520px;
+      border: 1px solid rgba(123, 97, 255, .16);
+      border-radius: 50%;
+      right: -220px;
+      top: -230px;
+      box-shadow: 0 0 0 28px rgba(123, 97, 255, .022), 0 0 0 56px rgba(76, 201, 255, .014);
+      z-index: -3
+    }
+
+    .light-streak {
+      width: 760px;
+      height: 1px;
+      right: -160px;
+      top: 72%;
+      background: linear-gradient(90deg, transparent, rgba(255, 54, 0, .25), transparent);
+      transform: rotate(-24deg);
+      z-index: -2
+    }
+
+    .shell {
+      width: min(1180px, calc(100vw - 56px));
+      min-height: min(700px, calc(100vh - 56px));
+      display: flex;
+      border: 1px solid rgba(255, 255, 255, .1);
+      background: linear-gradient(145deg, rgba(9, 12, 25, .92), rgba(6, 10, 22, .84));
+      box-shadow: 0 40px 90px rgba(0, 0, 0, .55), 0 0 80px rgba(123, 97, 255, .08);
+      position: relative;
+      overflow: hidden
+    }
+
+    .shell:after {
+      content: "";
+      position: absolute;
+      left: 7%;
+      right: 7%;
+      top: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(76, 201, 255, .55), rgba(255, 54, 0, .72), transparent);
+      z-index: 3
+    }
+
+    .brand-card {
+      flex: 0 0 46%;
+      display: flex;
+      align-items: center;
+      padding: 48px;
+      position: relative;
+      overflow: hidden;
+      color: #fff;
+      background: radial-gradient(circle at 20% 18%, rgba(255, 54, 0, .18), transparent 26%), radial-gradient(circle at 78% 78%, rgba(123, 97, 255, .12), transparent 28%), linear-gradient(145deg, #050711 0%, #0a1021 46%, #070b16 100%);
+      border-right: 1px solid rgba(255, 255, 255, .08)
+    }
+
+    .brand-inner {
+      width: min(100%, 435px);
+      position: relative;
+      z-index: 1
+    }
+
+    .micro-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      height: 28px;
+      padding: 0 10px;
+      border: 1px solid rgba(255, 255, 255, .1);
+      background: rgba(255, 255, 255, .025);
+      color: rgba(255, 255, 255, .62);
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: .16em;
+      text-transform: uppercase
+    }
+
+    .micro-label:before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--primary);
+      box-shadow: 0 0 14px rgba(255, 54, 0, .75)
+    }
+
+    .logo-wrap {
+      width: 200px;
+      height: 78px;
+      margin-top: 22px;
+      display: flex;
+      align-items: center;
+      gap: 18px
+    }
+
+    .logo-wrap img {
+      width: 82px;
+      height: 68px;
+      object-fit: contain;
+      display: block
+    }
+
+    .brand-title {
+      margin: 0;
+      color: #fff;
+      font-family: Outfit, Arial, sans-serif;
+      font-size: clamp(42px, 5vw, 64px);
+      font-weight: 800;
+      letter-spacing: -.03em
+    }
+
+    .brand-copy {
+      max-width: 390px;
+      margin: 15px 0 0;
+      color: rgba(255, 255, 255, .62);
+      font-size: 13px;
+      line-height: 1.75
+    }
+
+    .telemetry {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      margin-top: 26px;
+      border-top: 1px solid rgba(255, 255, 255, .08);
+      border-bottom: 1px solid rgba(255, 255, 255, .08)
+    }
+
+    .telemetry-item {
+      min-width: 0;
+      padding: 13px 12px 12px 0
+    }
+
+    .telemetry-item+.telemetry-item {
+      padding-left: 14px;
+      border-left: 1px solid rgba(255, 255, 255, .08)
+    }
+
+    .telemetry-label {
+      display: block;
+      color: rgba(255, 255, 255, .35);
+      font-size: 8px;
+      font-weight: 800;
+      letter-spacing: .14em;
+      text-transform: uppercase
+    }
+
+    .telemetry-value {
+      display: block;
+      margin-top: 5px;
+      color: #fff;
+      font-family: Outfit, Arial, sans-serif;
+      font-size: 12px;
+      font-weight: 700
+    }
+
+    .telemetry-value b {
+      color: var(--primary)
+    }
+
+    .telemetry-value .dot {
+      color: #5eff4c
+    }
+
+    .edge-readout {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 22px;
+      color: rgba(255, 255, 255, .34);
+      font-size: 8px;
+      font-weight: 800;
+      letter-spacing: .14em;
+      text-transform: uppercase
+    }
+
+    .edge-readout:before {
+      content: "";
+      width: 58px;
+      height: 2px;
+      background: linear-gradient(90deg, var(--primary), transparent);
+      box-shadow: 0 0 16px rgba(255, 54, 0, .35)
+    }
+
+    .auth-card {
+      flex: 1;
+      min-width: 0;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 52px 56px;
+      background: radial-gradient(circle at 12% 12%, rgba(255, 255, 255, .76), transparent 27%), radial-gradient(circle at 88% 22%, rgba(123, 97, 255, .12), transparent 24%), linear-gradient(135deg, rgba(255, 255, 255, .92), rgba(235, 240, 249, .7));
+      border-left: 1px solid rgba(255, 255, 255, .72)
+    }
+
+    .auth-card:before {
+      content: "AG / SYSTEM ACCESS";
+      position: absolute;
+      right: 22px;
+      top: 18px;
+      color: rgba(7, 11, 18, .28);
+      font-size: 8px;
+      font-weight: 800;
+      letter-spacing: .16em
+    }
+
+    .form-wrap {
+      width: min(100%, 440px)
+    }
+
+    .micro-status {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: 10px;
+      color: #7a8390;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase
+    }
+
+    .micro-status:before {
+      content: "";
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--primary);
+      box-shadow: 0 0 10px rgba(255, 54, 0, .5)
+    }
+
+    .form-kicker {
+      margin: 0 0 7px;
+      color: var(--primary);
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: .16em;
+      text-transform: uppercase
+    }
+
+    .form-title {
+      margin: 0;
+      color: var(--ink);
+      font-family: Outfit, Arial, sans-serif;
+      font-size: clamp(31px, 3.2vw, 44px);
+      line-height: .98;
+      letter-spacing: -.038em;
+      font-weight: 800
+    }
+
+    .form-subtitle {
+      margin: 9px 0 22px;
+      max-width: 420px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.55
+    }
+
+    .otp-input {
+      display: block;
+      width: 100%;
+      height: 64px;
+      padding: 0 15px;
+      border: 1px solid #d9dde4;
+      border-radius: 6px;
+      outline: none;
+      background: #fff;
+      color: var(--ink);
+      font-family: Outfit, Arial, sans-serif;
+      font-size: 30px;
+      font-weight: 700;
+      letter-spacing: .42em;
+      text-align: center;
+      transition: var(--transition)
+    }
+
+    .otp-input::placeholder {
+      color: #b8bec8;
+      letter-spacing: .3em
+    }
+
+    .otp-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(255, 54, 0, .075)
+    }
+
+    .field-note {
+      margin: 8px 0 0;
+      color: #89919e;
+      font-size: 10px
+    }
+
+    .ag-action-btn {
+      position: relative;
+      isolation: isolate;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      min-height: 45px;
+      margin-top: 16px;
+      padding: 11px 16px;
+      border: 1px solid var(--primary);
+      border-radius: 6px;
+      overflow: hidden;
+      background: #ff7b4d;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .03em;
+      transition: var(--transition)
+    }
+
+    .ag-action-btn:after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background: var(--primary);
+      transform: scaleY(1);
+      transition: transform .3s ease-out
+    }
+
+    .ag-action-btn:hover {
+      background: var(--ink-3);
+      border-color: var(--ink)
+    }
+
+    .ag-action-btn:hover:after {
+      transform: scaleY(0)
+    }
+
+    .secondary-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-top: 16px
+    }
+
+    .resend-btn,
+    .back-link {
+      border: 0;
+      background: transparent;
+      color: var(--primary);
+      font-size: 10px;
+      font-weight: 800
+    }
+
+    .resend-btn:disabled {
+      color: #9ba3ae;
+      cursor: not-allowed
+    }
+
+    .resend-btn:not(:disabled):hover,
+    .back-link:hover {
+      text-decoration: underline
+    }
+
+    .timer {
+      color: #7a8390;
+      font-size: 10px;
+      text-align: right
+    }
+
+    .status-message {
+      min-height: 14px;
+      margin-top: 13px;
+      color: #7a8390;
+      font-size: 10px;
+      line-height: 1.4
+    }
+
+    .prototype-note {
+      margin-top: 13px;
+      padding: 8px 9px;
+      border-left: 2px solid var(--primary);
+      background: rgba(255, 54, 0, .045);
+      color: #7a8390;
+      font-size: 9px;
+      line-height: 1.45
+    }
+
+    .back-row {
+      margin-top: 18px;
+      text-align: center;
+      color: #778090;
+      font-size: 10px
+    }
+
+    .back-link {
+      padding: 0;
+      margin-left: 3px
+    }
+
+    @keyframes sweep {
+
+      0%,
+      12% {
+        transform: translateY(-18vh);
+        opacity: 0
+      }
+
+      20% {
+        opacity: .5
+      }
+
+      48% {
+        transform: translateY(60vh);
+        opacity: .28
+      }
+
+      60%,
+      100% {
+        transform: translateY(122vh);
+        opacity: 0
+      }
+    }
+
+    @media(max-width:920px) {
+      .page {
+        padding: 14px
+      }
+
+      .shell {
+        width: min(820px, calc(100vw - 28px));
+        display: block
+      }
+
+      .brand-card {
+        min-height: 240px;
+        padding: 30px;
+        border-right: 0;
+        border-bottom: 1px solid rgba(255, 255, 255, .06)
+      }
+
+      .auth-card {
+        min-height: 470px;
+        padding: 40px 30px
+      }
+    }
+
+    @media(max-width:560px) {
+      .page {
+        padding: 8px
+      }
+
+      .shell {
+        width: calc(100vw - 16px)
+      }
+
+      .brand-card {
+        min-height: 212px;
+        padding: 22px
+      }
+
+      .micro-label {
+        height: 25px;
+        font-size: 8px
+      }
+
+      .logo-wrap {
+        width: auto;
+        height: 58px;
+        margin-top: 13px
+      }
+
+      .logo-wrap img {
+        width: 62px;
+        height: 52px
+      }
+
+      .brand-title {
+        font-size: 31px
+      }
+
+      .brand-copy {
+        margin-top: 8px;
+        font-size: 10px;
+        line-height: 1.5
+      }
+
+      .telemetry {
+        margin-top: 13px
+      }
+
+      .telemetry-item {
+        padding-top: 8px;
+        padding-bottom: 8px
+      }
+
+      .telemetry-label {
+        font-size: 7px
+      }
+
+      .telemetry-value {
+        font-size: 10px
+      }
+
+      .edge-readout {
+        display: none
+      }
+
+      .auth-card {
+        min-height: 440px;
+        padding: 34px 18px
+      }
+
+      .auth-card:before {
+        display: none
+      }
+
+      .form-title {
+        font-size: 30px
+      }
+
+      .form-subtitle {
+        font-size: 11px
+      }
+
+      .otp-input {
+        height: 58px;
+        font-size: 25px;
+        letter-spacing: .28em
+      }
+
+      .secondary-row {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 8px
+      }
+
+      .timer {
+        text-align: left
+      }
+    }
+
+    @media(prefers-reduced-motion:reduce) {
+
+      .scanline,
+      .ag-action-btn,
+      .ag-action-btn:after,
+      .otp-input {
+        animation: none;
+        transition: none
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="page" aria-label="AG-Enterprise OTP verification">
+    <div class="grid" aria-hidden="true"></div>
+    <div class="noise" aria-hidden="true"></div>
+    <div class="scanline" aria-hidden="true"></div>
+    <div class="hud-ring" aria-hidden="true"></div>
+    <div class="light-streak" aria-hidden="true"></div>
+    <section class="shell">
+      <aside class="brand-card" aria-label="AG-Enterprise brand panel">
+        <div class="brand-inner">
+          <div class="micro-label">Performance Access // Identity Check</div>
+          <div class="logo-wrap"><img src="{% static 'website/images/logo.png' %}" alt="AG-Enterprise logo">
+            <h1 class="brand-title">Enterprise</h1>
+          </div>
+          <p class="brand-copy">Precision machines. Intelligent service. A high-performance automotive experience built
+            for people who expect more.</p>
+          <div class="telemetry" aria-label="AG-Enterprise system readout">
+            <div class="telemetry-item"><span class="telemetry-label">Mode</span><span
+                class="telemetry-value">Performance <b>#01</b></span></div>
+            <div class="telemetry-item"><span class="telemetry-label">System</span><span class="telemetry-value">AG Core
+                <b>⚙</b></span></div>
+            <div class="telemetry-item"><span class="telemetry-label">Signal</span><span class="telemetry-value">Online
+                <b class="dot">●</b></span></div>
+          </div>
+          <div class="edge-readout">Engineered for the next drive</div>
+        </div>
+      </aside>
+      <section class="auth-card" aria-label="Verification form">
+        <div class="form-wrap">
+          <div class="micro-status">Secure channel // Code required</div>
+          <p class="form-kicker">Identity Verification</p>
+          <h2 class="form-title">Verify your access.</h2>
+          <p class="form-subtitle">Enter the six-digit code delivered to your registered email to continue into
+            AG-Enterprise.</p>
+          <form action="{% url 'verify_otp' %}" method="post" id="otpForm" novalidate>
+            {% csrf_token %}
+            <label for="otpCode" class="field-note"
+              style="display:block;margin:0 0 6px;color:var(--ink);font-weight:700">Access code
+            </label>
+            <input class="otp-input"
+                  id="otpCode"
+                  name="otp"
+                  type="text"
+                  inputmode="numeric"
+                  maxlength="6"
+                  minlength="6"
+                  pattern="[0-9]{6}"
+                  required>
+            <p class="field-note" id="otpHint">Six numeric characters. Carefully check your email.</p>
+            <div class="status-message" id="otpMessage" aria-live="polite"></div><button class="ag-action-btn"
+              type="submit">Verify Code</button>
+          </form>
+          <div class="secondary-row">
+
+            <form action="{% url 'resend_otp' %}" method="post" id="resendForm">
+              {% csrf_token %}
+
+              <button class="resend-btn" id="resendBtn" type="submit" disabled>
+                Resend Code
+              </button>
+            </form>
+
+            <span class="timer" id="timer" aria-live="polite">
+              Resend available in 60s
+            </span>
+
+          </div>
+          <div class="prototype-note">Please fill the verification code correctly// You have only 5 attempts to verify.
+          </div>
+          <div class="back-row">Need a different account?<a class="back-link" href="{% url 'account' %}">Return to
+              login</a>
+          </div>
+        </div>
+      </section>
+    </section>
+  </main>
+  <script>
+    const otpInput = document.getElementById('otpCode');
+    const form = document.getElementById('otpForm');
+    const message = document.getElementById('otpMessage');
+    const resend = document.getElementById('resendBtn');
+    const timer = document.getElementById('timer');
+    otpInput.focus();
+    otpInput.addEventListener('input', () => {
+      otpInput.value = otpInput.value.replace(/\D/g, '').slice(0, 6);
+      message.textContent = '';
+    });
+    form.addEventListener('submit', (event) => {
+      if (otpInput.value.length !== 6) {
+        event.preventDefault();
+        message.textContent = 'Enter all 6 digits to continue.';
+      }
+    });
+    let seconds = 60;
+    const countdown = setInterval(() => {
+      seconds -= 1;
+      if (seconds <= 0) {
+        clearInterval(countdown);
+        resend.disabled = false;
+        timer.textContent = 'You can request a new code.';
+      } else {
+        timer.textContent = `Resend available in ${seconds}s`;
+      }
+    }, 1000);
+  </script>
+
+  {% include 'website/components/toast.html' %}
+  <script src="{% static 'website/js/toast.js' %}"></script>
+
+</body>
+
+</html>

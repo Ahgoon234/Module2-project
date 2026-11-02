@@ -1,0 +1,51 @@
+{% load static %}
+
+<div class="delete-confirmation" id="deleteConfirmation" data-delete-confirmation aria-hidden="true" hidden>
+    <div class="delete-confirmation__backdrop" data-delete-close></div>
+
+    <section class="delete-confirmation__dialog" role="alertdialog" aria-modal="true"
+        aria-labelledby="deleteConfirmationTitle" aria-describedby="deleteConfirmationMessage" tabindex="-1">
+        <header class="delete-confirmation__header">
+            <div class="delete-confirmation__icon" aria-hidden="true">
+                <i class="fa-solid fa-trash"></i>
+            </div>
+            <div class="delete-confirmation__heading">
+                <span class="delete-confirmation__eyebrow">Destructive action</span>
+                <h2 class="delete-confirmation__title" id="deleteConfirmationTitle">
+                    Confirm Deletion
+                </h2>
+            </div>
+            <button type="button" class="delete-confirmation__close" data-delete-close
+                aria-label="Close delete confirmation">
+                <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+            </button>
+        </header>
+
+        <div class="delete-confirmation__body">
+            <p class="delete-confirmation__message" id="deleteConfirmationMessage">
+                Are you sure you want to delete
+                <strong class="delete-confirmation__item-name" data-delete-item-name></strong>?
+            </p>
+            <p class="delete-confirmation__warning">
+                <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+                <span>This action cannot be undone.</span>
+            </p>
+        </div>
+
+        <form id="deleteForm" method="post" action="" class="delete-confirmation__footer">
+            {% csrf_token %}
+            <button type="button" class="delete-confirmation__button delete-confirmation__button--cancel"
+                data-delete-cancel>
+                Cancel
+            </button>
+            <button type="submit" class="delete-confirmation__button delete-confirmation__button--danger"
+                data-delete-accept>
+                <i class="fa-solid fa-trash" aria-hidden="true"></i>
+                <span>Delete</span>
+            </button>
+        </form>
+
+        <p class="delete-confirmation__feedback" data-delete-feedback role="status" aria-live="polite" hidden></p>
+    </section>
+</div>
+

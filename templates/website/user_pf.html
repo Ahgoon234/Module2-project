@@ -1,0 +1,208 @@
+{% load static %}
+{% load humanize %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#050B20">
+    <title>AG-Enterprise | My Profile</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="{% static 'website/css/user.css' %}">
+    <link rel="stylesheet" href="{% static 'website/css/toast.css' %}">
+    <link rel="stylesheet" href="{% static 'website/fontawesome/css/all.min.css' %}">
+
+</head>
+
+<body>
+
+    <div class="loader-wrapper" id="preloader">
+        <div class="loader"></div>
+        <div class="loader-section section-left"></div>
+        <div class="loader-section section-right"></div>
+    </div>
+
+    <header class="site-header">
+        <div class="brand">
+            <img class="brand-mark" aria-hidden="true" src="{% static 'website/images/logo.png'%}">
+            <span class="brand-text">AG-Enterprise</span>
+        </div>
+    </header>
+
+    <main class="page">
+        <div class="layout">
+
+            <!-- LEFT — user profile card -->
+            <section class="profile-panel" aria-labelledby="profile-title">
+                <div class="profile-card">
+                    <div class="profile-head">
+                        <p class="section-kicker">Account</p>
+                        <h1 id="profile-title" class="section-title">My Profile</h1>
+                        <div class="avatar" aria-hidden="true">
+                            {% if profile.profile_image %}
+                            <img src="{{ profile.profile_image.url }}" alt="{{ request.user.username }}">
+                            {% else %}
+                            <svg viewBox="0 0 24 24" width="36" height="36" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="12" cy="8" r="3.4" stroke="currentColor" stroke-width="1.6" />
+
+                                <path d="M5.5 19.2c.8-3.4 3.3-5.2 6.5-5.2s5.7 1.8 6.5 5.2" stroke="currentColor"
+                                    stroke-width="1.6" stroke-linecap="round" />
+                            </svg>
+                            {% endif %}
+                        </div>
+                        <form action="{% url 'edit_user_pf' %}" method="post" enctype="multipart/form-data"
+                            id="profileImageForm">
+                            {% csrf_token %}
+                            <input type="file" name="profile_image" id="profileImageInput" hidden>
+
+                            <label for="profileImageInput" class="edit-profile-image">
+                                Edit
+                            </label>
+
+                        </form>
+                        <p class="profile-name">{{ request.user.username }}</p>
+
+                    </div>
+
+                    <form class="profile-form" onsubmit="return false;">
+                        <div class="field">
+                            <label for="username">Username</label>
+                            <input id="username" type="text" value="{{ request.user.username }}" readonly>
+                        </div>
+
+                        <div class="field">
+                            <label for="email">Email</label>
+                            <input id="email" type="email" value="{{ request.user.email }}" readonly>
+                        </div>
+                    </form>
+
+                    <div class="profile-actions">
+                        <button type="button" class="btn btn-primary" id="logoutBtn">
+                            Logout
+                            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                        </button>
+                        <a class="btn btn-outline" href="{% url 'home' %}">
+                            <i class="fa-solid fa-home" style="color: #ff3600;"></i>Back to Home
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- RIGHT — previous orders with sample data -->
+            <section class="orders-panel" aria-labelledby="orders-title">
+                <div class="orders-head">
+                    <p class="section-kicker">History</p>
+                    <h2 id="orders-title" class="section-title">My Orders</h2>
+                    <p class="orders-subtitle">Spare parts and service items placed through AG-Enterprise.</p>
+                </div>
+
+                <div class="orders-list">
+
+                    {% if orders %}
+
+                    {% for order in orders %}
+                    <article class="order-card">
+                        <header class="order-header">
+                            <div>
+                                <p class="order-id">Order #{{ order.id.hex|slice:":12"|upper }}</p>
+                                <p class="order-meta-line">Placed {{ order.created_at|naturaltime }}</p>
+                            </div>
+                            <div class="order-head-right">
+
+                                {% if order.status == 'pending' %}
+                                <span class="badge badge-pending">Pending</span>
+
+                                {% elif order.status == 'cancelled' %}
+                                <span class="badge badge-cancelled">Cancelled</span>
+
+                                {% elif order.status == 'confirmed' %}
+                                <span class="badge badge-confirmed">Confirmed</span>
+
+                                {% endif %}
+                                <button type="button" class="order-toggle" aria-expanded="true"
+                                    aria-label="Collapse order details">Details</button>
+                            </div>
+                        </header>
+                        {% if order.status == 'cancelled' and order.cancel_reason %}
+
+                        <div class="order-cancel-reason">
+                            <strong>Order Cancelled</strong>
+                            <span>
+                                Due to: {{ order.get_cancel_reason_display }}
+                            </span>
+                        </div>
+
+                        {% endif %}
+
+                        <ul class="item-list">
+                            {% for item in order.items.all %}
+                            <li class="item-row">
+                                <div>
+                                    <p class="item-name">{{ item.sparepart.name }}</p>
+                                    <p class="item-qty">Qty: {{ item.quantity|intcomma }}</p>
+                                </div>
+                                <p class="item-price">$ {{ item.subtotal|floatformat:0|intcomma }}</p>
+                            </li>
+                            {% endfor %}
+                        </ul>
+
+                        <footer class="order-footer">
+                            <span class="order-date">{{ order.created_at|naturaltime }}</span>
+                            <span class="order-total">Total 
+                                <strong>{{ order.total_amount|floatformat:0|intcomma }}</strong>
+                            </span>
+                        </footer>
+                    </article>
+                    {% endfor %}
+
+                    {% else %}
+                    <div class="empty-orders">
+                        <p>No orders yet.</p>
+                    </div>
+                    {% endif %}
+
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Compact footer -->
+    <footer class="site-footer">
+        <p>© 2026 AG-Enterprise</p>
+        <p class="footer-tag">Car Showroom &amp; Spare Parts</p>
+    </footer>
+
+    <!-- Logout confirmation modal (hidden until JS opens it) -->
+    <div class="modal" id="logoutModal" hidden>
+        <div class="modal-backdrop" data-close-modal></div>
+        <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="logoutTitle">
+            <h3 id="logoutTitle">Sign out?</h3>
+            <p>You will leave this profile session.In order to gain full user access, you need to stay logged in.</p>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-outline" data-close-modal>Stay</button>
+                <form action="{% url 'logout_view' %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary">
+                        Logout
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    {% include 'website/components/toast.html' %}
+    <script src="{% static 'website/js/toast.js' %}"></script>
+    <script src="{% static 'website/js/user.js' %}"></script>
+
+</body>
+
+</html>

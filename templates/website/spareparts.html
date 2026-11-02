@@ -1,0 +1,132 @@
+{% extends 'website/components/base.html' %}
+
+{% load static %}
+{% load humanize %}
+
+{% block body %}
+
+<!-- Breadcrumb area start -->
+<!-- rts breadcrumb area start -->
+<div class="rts-breadcrumb-area service jarallax">
+    <div class="container">
+        <div class="breadcrumb-area-wrapper">
+            <h1 class="title">Shop</h1>
+            <div class="nav-bread-crumb">
+                <a href="{% url 'home' %}">Home</a>
+                <a href="#" class="current">Shop</a>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- rts breadcrumb area end -->
+<!-- Breadcrumb area end -->
+<div class="rts-shop-area inner rts-section-gapTop">
+    <div class="container">
+        <div class="shop-filter-area">
+            <p>Showing {{ spareparts|length }} results</p>
+            <div>
+
+                <form action="{% url 'spareparts' %}" method="get" class="select-area" accept-charset="utf-8">
+                    {% if request.GET.brand or request.GET.partcategory %}
+                    <div class="d-flex">
+                        <a href="{% url 'spareparts' %}" class="rts-btn radius-big icon btn-primary">
+                            Clear Filter
+                        </a>
+                    </div>
+                    {% endif %}
+                    <select name="brand" class="mySelect" onchange="this.form.submit()">
+                        <option value="">Brand</option>
+
+                        {% for brand in brands %}
+                        <option value="{{ brand.id }}" {% if request.GET.brand == brand.id|stringformat:"s" %} selected {% endif %}>
+                            {{ brand.title }}
+                        </option>
+                        {% endfor %}
+                    </select>
+
+                    <select name="partcategory" class="my_select2" onchange="this.form.submit()">
+                        <option value="">Category</option>
+
+                        {% for category in partcategories %}
+                        <option value="{{ category.id }}" {% if request.GET.partcategory == category.id|stringformat:"s" %} selected {% endif %}>
+                            {{ category.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+
+                </form>
+            </div>
+        </div>
+        <div class="row g-5">
+            {% for sparepart in spareparts %}
+            <div class="col-lg-4 col-md-6">
+                <div class="project-wrapper4">
+                    <div class="image-area">
+                        <a href="{% url 'sparepart_detail' sparepart.id %}">
+                            {% if sparepart.thumbnail %}
+                            <img src="{{ sparepart.thumbnail.url }}" alt="{{ sparepart.name }}">
+                            {% endif %}
+                        </a>
+                    </div>
+                    <div class="content-area">
+
+                        <h6 class="title "><a href="{% url 'sparepart_detail' sparepart.id %}">{{ sparepart.name }}</a>
+                        </h6>
+                        <div class="button-area">
+                            <p class="">${{ sparepart.price|floatformat:2|intcomma }}</p>
+                            <a href="{% url 'sparepart_detail' sparepart.id %}" class="rts-btn btn-primary radius-big icon">
+                                View Detail
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <p>No spareparts available.</p>
+            </div>
+            {% endfor %}
+        </div>
+        {% with brand=request.GET.brand partcategory=request.GET.partcategory %}
+
+        {% if spareparts.has_other_pages %}
+        <div class="rts-pagination">
+
+            {% if spareparts.has_previous %}
+            <a href="?brand={{ brand|default:''|urlencode }}&partcategory={{ partcategory|default:''|urlencode }}&page={{ spareparts.previous_page_number }}"
+                class="rts-pagination-btn pagination-arrow">
+                <i class="fa-regular fa-arrow-left"></i>
+            </a>
+            {% endif %}
+
+            {% for num in spareparts.paginator.page_range %}
+
+            {% if spareparts.number == num %}
+            <span class="rts-pagination-btn active">
+                {{ num }}
+            </span>
+            {% else %}
+            <a href="?brand={{ brand|default:''|urlencode }}&partcategory={{ partcategory|default:''|urlencode }}&page={{ num }}"
+                class="rts-pagination-btn">
+                {{ num }}
+            </a>
+            {% endif %}
+
+            {% endfor %}
+
+            {% if spareparts.has_next %}
+            <a href="?brand={{ brand|default:''|urlencode }}&partcategory={{ partcategory|default:''|urlencode }}&page={{ spareparts.next_page_number }}"
+                class="rts-pagination-btn pagination-arrow">
+                <i class="fa-regular fa-arrow-right"></i>
+            </a>
+            {% endif %}
+
+        </div>
+        {% endif %}
+
+        {% endwith %}
+    </div>
+</div>
+
+
+{% endblock body %}

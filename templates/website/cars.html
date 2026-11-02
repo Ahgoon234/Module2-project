@@ -1,0 +1,192 @@
+{% extends 'website/components/base.html' %}
+
+{% load static %}
+{% load humanize %}
+
+{% block body %}
+
+
+<!-- Breadcrumb area start -->
+<!-- rts breadcrumb area start -->
+<div class="rts-breadcrumb-area portfolio jarallax">
+    <div class="container">
+        <div class="breadcrumb-area-wrapper">
+            <h1 class="title">Welcome...</h1>
+            <div class="nav-bread-crumb">
+                <a href="#" class="current">AG-Cars</a>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- rts breadcrumb area end -->
+<!-- Breadcrumb area end -->
+<div class="rts-select-area inner">
+    <div class="container">
+        <div class="select-inner">
+            <form action="{% url 'cars' %}" method="get" accept-charset="utf-8">
+                <div class="select-area-down wow fadeInUp" data-wow-delay=".8s" data-wow-duration="1s">
+
+                    <div class="select-2">
+                        <select name="brand" class="mySelect">
+                            <option value="">Brand</option>
+                            {% for brand in brands %}
+                            <option value="{{ brand.id }}" {% if request.GET.brand == brand.id|stringformat:"s" %}selected{% endif %}>
+                                {{ brand.title }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="select-2">
+                        <select name="category" class="my_select2">
+                            <option value="">Category</option>
+                            {% for category in categories %}
+                            <option value="{{ category.id }}" {% if request.GET.category == category.id|stringformat:"s" %}selected{% endif %}>
+                                {{ category.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="select-2">
+                        <select name="fuel_type" class="my_select2">
+                            <option value="">Fuel-Type</option>
+                            {% for value,label in fuel_choices %}
+                            <option value="{{ value }}" {% if request.GET.fuel_type == value %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <button type="submit" class="rts-btn radius-big icon btn-primary">
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M10.69 10.69L13 13M12.3333 6.68575C12.3333 9.826 9.796 12.3715 6.667 12.3715C3.53725 12.3715 1 9.826 1 6.6865C1 3.54475 3.53725 1 6.66625 1C9.796 1 12.3333 3.5455 12.3333 6.68575Z"
+                                stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            </path>
+                        </svg>
+                        Search
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="rts-portfolio-area inner rts-section-gapNew">
+    <div class="container">
+        <div class="row g-5">
+            {% if request.GET.search or request.GET.brand or request.GET.category or request.GET.fuel_type %}
+            <div class="d-flex justify-content-end p-0 mt-0 mb-5">
+                <a href="{% url 'cars' %}" class="rts-btn radius-big icon btn-primary">
+                    View all Cars
+                </a>
+            </div>
+            {% endif %}
+            {% for car in cars %}
+            <div class="col-lg-4">
+                <div class="project-wrapper2">
+                    <div class="image-area">
+                        <a href="{% url 'car_detail' car.id %}">
+                            {% if car.thumbnail %}
+                            <img src="{{ car.thumbnail.url }}" alt="{{ car.name }}">
+                            {% endif %}
+                        </a>
+                        <span class="tag">{{ car.get_condition_display }}</span>
+                        {% for image in car.images.all %}
+
+                        {% if forloop.first %}
+
+                        <a href="{{ image.image.url }}" class="gallery-image" data-gallery="car-{{ car.id }}">
+
+                            <img src="{% static 'website/images/image.svg' %}" alt="">
+                            {{ car.images.count }}
+
+                        </a>
+
+                        {% else %}
+
+                        <a href="{{ image.image.url }}" class="gallery-image" data-gallery="car-{{ car.id }}"
+                            style="display: none;">
+                        </a>
+
+                        {% endif %}
+
+                        {% endfor %}
+                    </div>
+                    <div class="content-area">
+
+                        <h6 class="title ">
+                            <a href="{% url 'car_detail' car.id %}">{{ car.name }}</a>
+                        </h6>
+                        <ul class="feature-area">
+                            <li>
+                                <img src="{% static 'website/images/01 copy.svg' %}" alt="">
+                                {{ car.mileage }} Miles
+                            </li>
+                            <li>
+                                <img src="{% static 'website/images/02_2.svg' %}" alt="">
+                                {{ car.get_fuel_type_display}}
+                            </li>
+                            <li>
+                                <img src="{% static 'website/images/03_1 copy.svg' %}" alt="">
+                                {{ car.get_transmission_display }}
+                            </li>
+
+                        </ul>
+                        <div class="button-area">
+                            <p class="">${{ car.price|floatformat:0|intcomma }}</p>
+                            <a href="{% url 'car_detail' car.id %}" class="rts-btn btn-primary radius-small">View
+                                Details</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-lg-4">
+                <p>No car available yet.</p>
+            </div>
+            {% endfor %}
+        </div>
+        {% with search=request.GET.search brand=request.GET.brand category=request.GET.category fuel_type=request.GET.fuel_type %}
+
+        {% if cars.has_other_pages %}
+        <div class="rts-pagination">
+
+            {% if cars.has_previous %}
+            <a href="?search={{ search|default:''|urlencode }}&brand={{ brand|default:''|urlencode }}&category={{ category|default:''|urlencode }}&fuel_type={{ fuel_type|default:''|urlencode }}&page={{ cars.previous_page_number }}"
+                class="rts-pagination-btn pagination-arrow">
+                <i class="fa-regular fa-arrow-left"></i>
+            </a>
+            {% endif %}
+
+            {% for num in cars.paginator.page_range %}
+
+            {% if cars.number == num %}
+            <span class="rts-pagination-btn active">
+                {{ num }}
+            </span>
+            {% else %}
+            <a href="?search={{ search|default:''|urlencode }}&brand={{ brand|default:''|urlencode }}&category={{ category|default:''|urlencode }}&fuel_type={{ fuel_type|default:''|urlencode }}&page={{ num }}"
+                class="rts-pagination-btn">
+                {{ num }}
+            </a>
+            {% endif %}
+
+            {% endfor %}
+
+            {% if cars.has_next %}
+            <a href="?search={{ search|default:''|urlencode }}&brand={{ brand|default:''|urlencode }}&category={{ category|default:''|urlencode }}&fuel_type={{ fuel_type|default:''|urlencode }}&page={{ cars.next_page_number }}"
+                class="rts-pagination-btn pagination-arrow">
+                <i class="fa-regular fa-arrow-right"></i>
+            </a>
+            {% endif %}
+
+        </div>
+        {% endif %}
+
+        {% endwith %}
+    </div>
+</div>
+
+{% endblock body %}

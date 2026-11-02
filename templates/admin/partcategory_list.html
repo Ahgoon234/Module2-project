@@ -1,0 +1,126 @@
+{% extends 'admin/components/base.html' %}
+
+{% load static %}
+
+{% block body %}
+
+<main class="admin-content" id="adminContent">
+    <section class="dashboard-card dashboard-card--table">
+        <div class="dashboard-card-header">
+            <h3 class="dashboard-card-title">All Sparepart Categories</h3>
+            {% if perms.lore.add_partcategorymodel %}
+            <a href="#" class="quick-action-btn" data-admin-action="create" data-admin-module="partcategory">
+                <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                Add Sparepart Category
+                <i class="fa-solid fa-layer-group" aria-hidden="true"></i>
+            </a>
+            {% endif %}
+        </div>
+
+        <!-- Search Form -->
+        <form method="get" action="{% url 'partcategory_list' %}" class="car-filter-search">
+
+            <input type="search" name="search" placeholder="Search sparepart category name..." value="{{ request.GET.search|default:'' }}">
+
+            <button type="submit" class="car-filter-submit">
+                <i class="fas fa-search"></i> Search
+            </button>
+            {% if request.GET.search %}
+            <a href="{% url 'partcategory_list' %}" class="car-filter-clear">
+                Clear
+            </a>
+            {% endif %}
+        </form>
+
+        <div class="table-responsive">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Sparepart Category</th>
+                        <th>Created Date</th>
+                        <th>Updated Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pcategory in partcategories %}
+                    <tr data-partcategory-id="{{ pcategory.id }}">
+                        <td data-label="Part Category">{{ pcategory.name }}</td>
+                        <td data-label="Created Date">{{ pcategory.created_at }}</td>
+                        <td data-label="Updated Date">{{ pcategory.updated_at }}</td>
+                        <td data-label="Actions">
+                            <div class="table-actions">
+                                <a href="#" class="table-action-btn" aria-label="View" data-admin-action="view"
+                                    data-admin-module="partcategory"><i class="fa-solid fa-eye"
+                                        aria-hidden="true"></i></a>
+
+                                {% if perms.lore.change_partcategorymodel %}
+                                <a href="#" class="table-action-btn" aria-label="Edit" data-admin-action="edit"
+                                    data-admin-module="partcategory"><i class="fa-solid fa-pen"
+                                        aria-hidden="true"></i>
+                                </a>
+                                {% endif %}
+
+                                {% if perms.lore.delete_partcategorymodel %}
+                                <a href="{% url 'partcategory_delete' pcategory.id %}"
+                                    class="table-action-btn table-action-btn--danger" data-delete-trigger
+                                    data-delete-name="{{ pcategory.name }}" data-delete-id="{{ pcategory.id }}"
+                                    aria-label="Delete {{ pcategory.name }}"><i class="fa-solid fa-trash"
+                                        aria-hidden="true"></i>
+                                </a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4">No Sparepartcategory found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+
+{% endblock body %}
+
+{% block form %}
+
+<div class="admin-modal" id="partcategoryModal" data-admin-modal data-admin-module="partcategory" aria-hidden="true">
+    <div class="admin-modal-backdrop" data-modal-close></div>
+    <section class="admin-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="partcategoryModalTitle">
+        <div class="admin-modal-header">
+            <div><span class="admin-modal-kicker">Sparepart Category Managing Form</span>
+                <h2 class="admin-modal-title" id="partcategoryModalTitle" data-modal-title>Add New Part Category
+                </h2>
+                <p class="admin-modal-subtitle" data-modal-subtitle>Enter the details below to add a new part
+                    category.</p>
+            </div>
+            <button type="button" class="admin-modal-close" data-modal-close aria-label="Close part category form"><i
+                    class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+        </div>
+        <form method="post" action="{% url 'partcategory_create' %}" data-create-url="{% url 'partcategory_create' %}"
+            data-update-base-url="{% url 'partcategory_update' '00000000-0000-0000-0000-000000000000' %}"
+            enctype="multipart/form-data" id="partcategoryForm" class="admin-modal-form" data-modal-form novalidate>
+            {% csrf_token %}
+            <div class="admin-modal-body">
+                <div class="admin-form-grid">
+                    <div class="admin-field">
+                        <label>Name</label>
+                        <input type="text" id="partcategoryName" name="name" required placeholder="e.g. Brake System">
+
+                    </div>
+                </div>
+            </div>
+            <div class="admin-modal-footer"><span class="admin-modal-disclaimer text-danger">Please double-check your details before
+                    submitting. Any mistakes may affect data accuracy and will be considered a performance issue.</span>
+                <div class="admin-modal-actions"><button type="button" class="ag-btn ag-btn-secondary"
+                        data-modal-close>Cancel</button><button type="submit" class="ag-btn ag-btn-primary"
+                        data-submit-button>Create Part Category</button></div>
+            </div>
+        </form>
+    </section>
+</div>
+
+{% endblock form %}

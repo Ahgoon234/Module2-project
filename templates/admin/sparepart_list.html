@@ -1,0 +1,253 @@
+{% extends 'admin/components/base.html' %}
+
+{% load static %}
+{% load humanize %}
+
+{% block body %}
+
+<main class="admin-content" id="adminContent">
+    <section class="dashboard-card dashboard-card--table">
+        <div class="dashboard-card-header">
+            <h3 class="dashboard-card-title">All Spareparts</h3>
+            {% if perms.lore.add_sparepartmodel %}
+            <a href="#" class="quick-action-btn" data-admin-action="create" data-admin-module="sparepart">
+                <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                Add Sparepart
+                <i class="fa-solid fa-gears" aria-hidden="true"></i>
+            </a>
+            {% endif %}
+        </div>
+        <!-- Search Form -->
+        <form method="get" action="{% url 'sparepart_list' %}" class="car-filter-search">
+            <input type="search" name="search" placeholder="Search sparepart name..." value="{{ request.GET.search|default:'' }}">
+
+            <button type="submit" class="car-filter-submit">
+                <i class="fas fa-search"></i> Search
+            </button>
+        </form>
+
+        <!-- Filter Form -->
+        <form method="get" action="{% url 'sparepart_list' %}" class="car-filter-panel">
+
+            <select name="brand" class="car-filter-select">
+                <option value="">All Brands</option>
+                {% for brand in brands %}
+                <option value="{{ brand.id }}" {% if request.GET.brand == brand.id|stringformat:"s" %}selected{% endif %}>
+                    {{ brand.title }}
+                </option>
+                {% endfor %}
+            </select>
+
+            <select name="category" class="car-filter-select">
+                <option value="">All Categories</option>
+                {% for category in partcategories %}
+                <option value="{{ category.id }}" {% if request.GET.category == category.id|stringformat:"s" %}selected{% endif %}>
+                    {{ category.name }}
+                </option>
+                {% endfor %}
+            </select>
+
+            <button type="submit" class="car-filter-submit">
+                <i class="fas fa-filter"></i> Apply Filters
+            </button>
+            {% if request.GET.search or request.GET.brand or request.GET.category %}
+            <a href="{% url 'sparepart_list' %}" class="car-filter-clear">
+                Clear
+            </a>
+            {% endif %}
+        </form>
+        <div class="table-responsive">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Sparepart</th>
+                        <th>Part Category</th>
+                        <th>Brand</th>
+                        <th>Price</th>
+                        <th>Stock</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sparepart in spareparts %}
+                    <tr data-sparepart-id="{{ sparepart.id }}" data-name="{{ sparepart.name }}"
+                        data-partcategory="{% if sparepart.category %}{{ sparepart.category.id }}{% endif %}"
+                        data-brand="{{ sparepart.brand.id }}" data-price="{{ sparepart.price }}"
+                        data-stock="{{ sparepart.stock }}"
+                        data-description="{{ sparepart.description|default:''|escape }}"
+                        data-thumbnail="{% if sparepart.thumbnail %}{{ sparepart.thumbnail.url }}{% endif %}"
+                        data-gallery='[
+                            {% for image in sparepart.images.all %}
+                            {
+                                "id": "{{ image.id }}",
+                                "src": "{{ image.image.url }}"
+                            }{% if not forloop.last %},{% endif %}
+                            {% endfor %}
+                        ]'>
+                        <td data-label="Sparepart">
+                            <div class="table-car">
+                                <img src="{{ sparepart.thumbnail.url }}" alt="{{ sparepart.name }}"
+                                    class="sparepart_img">
+                                {{ sparepart.name }}
+                            </div>
+                        </td>
+                        <td data-label="Part Category">{% if sparepart.category %} {{ sparepart.category.name }} {% else %} None Category {% endif %} </td>
+                        <td data-label="Brand"> {{ sparepart.brand.title }} </td>
+                        <td data-label="Price"> {{ sparepart.price|floatformat:2|intcomma }} </td>
+                        <td data-label="Stock">
+                            <span class="status-badge status-badge--available"> {{ sparepart.stock }} in stock </span>
+                        </td>
+                        <td data-label="Actions">
+                            <div class="table-actions">
+                                <a href="#" class="table-action-btn" aria-label="View" data-admin-action="view"
+                                    data-admin-module="sparepart"><i class="fa-solid fa-eye" aria-hidden="true"></i></a>
+
+                                {% if perms.lore.change_sparepartmodel %}
+                                <a href="#" class="table-action-btn" aria-label="Edit" data-admin-action="edit"
+                                    data-admin-module="sparepart"><i class="fa-solid fa-pen" aria-hidden="true"></i></a>
+                                {% endif %}
+
+                                {% if perms.lore.delete_sparepartmodel %}
+                                <a href="{% url 'sparepart_delete' sparepart.id %}"
+                                    class="table-action-btn table-action-btn--danger" data-delete-trigger
+                                    data-delete-id="{{ sparepart.id }}" data-delete-name="{{ sparepart.name }}"
+                                    aria-label="Delete {{ sparepart.name }}"><i class="fa-solid fa-trash" aria-hidden="true"></i>
+                                </a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6">No Sparepart found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+
+{% endblock body %}
+
+{% block form %}
+
+<div class="admin-modal" id="sparepartModal" data-admin-modal data-admin-module="sparepart" aria-hidden="true">
+    <div class="admin-modal-backdrop" data-modal-close></div>
+    <section class="admin-modal-dialog admin-modal-dialog--large" role="dialog" aria-modal="true"
+        aria-labelledby="sparepartModalTitle">
+        <div class="admin-modal-header">
+            <div><span class="admin-modal-kicker">Sparepart Details Form</span>
+                <h2 class="admin-modal-title" id="sparepartModalTitle" data-modal-title>Add New Sparepart</h2>
+                <p class="admin-modal-subtitle" data-modal-subtitle>Enter the details below to add a new sparepart.
+                </p>
+            </div>
+            <button type="button" class="admin-modal-close" data-modal-close aria-label="Close sparepart form"><i
+                    class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+        </div>
+        <form method="post" action="{% url 'sparepart_create' %}" data-create-url="{% url 'sparepart_create' %}"
+            data-update-base-url="{% url 'sparepart_update' '00000000-0000-0000-0000-000000000000' %}"
+            enctype="multipart/form-data" id="sparepartForm" class="admin-modal-form" data-modal-form novalidate>
+            {% csrf_token %}
+            <div class="admin-modal-body">
+                <div class="admin-form-grid">
+                    <div class="admin-field">
+                        <label>Name</label>
+                        <input type="text" id="sparepartName" name="name" required placeholder="e.g. Brake Pad">
+
+                    </div>
+                    <div class="admin-field">
+                        <label>Brand</label>
+                        <select id="sparepartBrand" name="brand" required>
+                            <option value="">Select an option</option>
+                            {% for brand in brands %}
+                            <option value="{{ brand.id }}">{{ brand.title }}</option>
+                            {% endfor %}
+                        </select>
+
+                    </div>
+                    <div class="admin-field">
+                        <label>Category</label>
+                        <select id="sparepartCategory" name="partcategory" required>
+                            <option value="">Select an option</option>
+                            {% for partcategory in partcategories %}
+                            <option value="{{ partcategory.id }}">{{ partcategory.name }}</option>
+                            {% endfor %}
+                        </select>
+
+                    </div>
+                    <div class="admin-field">
+                        <label>Stock</label>
+                        <input type="number" id="sparepartStock" name="stock" required placeholder="0">
+
+                    </div>
+                    <div class="admin-field">
+                        <label>Price</label>
+                        <input type="number" id="sparepartPrice" name="price" min="0.01" step="0.01" required placeholder="0.00">
+
+                    </div>
+
+                    <div class="admin-field admin-field--full">
+                        <label>Description</label>
+                        <textarea id="sparepartDescription" name="description" rows="4"
+                            placeholder="Add a short description of the spare part"></textarea>
+
+                    </div>
+                    <div class="admin-field">
+                        <label>Thumbnail</label>
+                        <div class="admin-image-upload">
+                            <input type="file" id="sparepartThumbnail" name="thumbnail" accept="image/webp"
+                                data-image-input data-preview-target="sparepartThumbnailPreview">
+                            <label class="admin-upload-control" for="sparepartThumbnail">
+                                <span class="admin-upload-icon"><i class="fa-solid fa-cloud-arrow-up"
+                                        aria-hidden="true"></i></span>
+                                <span class="admin-upload-copy"><strong>Sparepart thumbnail</strong><small
+                                        data-upload-label>Choose image</small></span>
+                            </label>
+                            <div class="admin-single-preview" id="sparepartThumbnailPreview" data-single-preview hidden>
+                                <img src="" alt="Sparepart thumbnail preview" data-single-preview-image>
+                                <div class="admin-single-preview-copy"><strong data-preview-name>No image
+                                        selected</strong><small>Preview only</small></div>
+                                <button type="button" class="admin-image-clear" data-clear-single
+                                    data-input-id="sparepartThumbnail"
+                                    aria-label="Remove selected sparepart thumbnail"><i class="fa-solid fa-xmark"
+                                        aria-hidden="true"></i></button>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="admin-form-section admin-field--full">
+                        <div class="admin-form-section-heading">
+                            <div><span class="admin-field-label">Gallery Images</span><small>Additional images for
+                                    the sparepart gallery</small></div><span class="admin-section-badge">Multiple</span>
+                        </div>
+                        <div class="admin-gallery-upload">
+                            <input type="file" id="sparepartGallery" name="gallery_images" accept="image/*" multiple
+                                data-gallery-input>
+                            <label class="admin-upload-control admin-upload-control--gallery"
+                                for="sparepartGallery"><span class="admin-upload-icon"><i class="fa-solid fa-images"
+                                        aria-hidden="true"></i></span><span class="admin-upload-copy"><strong>Choose
+                                        gallery images</strong><small>Add more images at any
+                                        time</small></span><span class="admin-upload-action">Browse</span></label>
+                        </div>
+                        <div class="admin-gallery-preview" data-gallery-preview aria-live="polite">
+                            <div class="admin-gallery-empty">No gallery images selected yet.</div>
+                        </div>
+                        <div id="sparepartDeletedImages" data-deleted-images></div>
+                    </div>
+                </div>
+            </div>
+            <div class="admin-modal-footer"><span class="admin-modal-disclaimer text-danger">Please double-check your details before
+                    submitting. Any mistakes may affect data accuracy and will be considered a performance issue.</span>
+                <div class="admin-modal-actions">
+                    <button type="button" class="ag-btn ag-btn-secondary" data-modal-close>Cancel</button>
+                    <button type="submit" class="ag-btn ag-btn-primary" data-submit-button>Create Sparepart</button>
+                </div>
+            </div>
+        </form>
+    </section>
+</div>
+
+
+{% endblock form %}

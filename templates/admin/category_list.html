@@ -1,0 +1,157 @@
+{% extends 'admin/components/base.html' %}
+
+{% load static %}
+
+{% block body %}
+
+<main class="admin-content" id="adminContent">
+    <section class="dashboard-card dashboard-card--table">
+        <div class="dashboard-card-header">
+            <h3 class="dashboard-card-title">All Categories</h3>
+            {% if perms.lore.add_categorymodel %}
+            <a href="#" class="quick-action-btn" data-admin-action="create" data-admin-module="category">
+                <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                Add Category
+                <i class="fa-solid fa-folder" aria-hidden="true"></i>
+            </a>
+            {% endif %}
+        </div>
+
+        <!-- Search Form -->
+        <form method="get" action="{% url 'category_list' %}" class="car-filter-search">
+
+            <input type="search" name="search" placeholder="Search category name..." value="{{ request.GET.search|default:'' }}">
+
+            <button type="submit" class="car-filter-submit">
+                <i class="fas fa-search"></i> Search
+            </button>
+            {% if request.GET.search %}
+            <a href="{% url 'category_list' %}" class="car-filter-clear">
+                Clear
+            </a>
+            {% endif %}
+        </form>
+
+        <div class="table-responsive">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Created Date</th>
+                        <th>Updated Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for category in categories %}
+                    <tr data-category-id="{{ category.id }}">
+                        <td data-label="Category">
+                            <div class="table-car">
+                                {% if category.image %}
+                                <img src="{{ category.image.url }}" alt="" class="category_img">
+                                {% else %}
+                                <div class="category_img">
+                                    <i class="fa-solid fa-image"></i>
+                                </div>
+                                {% endif %}
+
+                                {{ category.name }}
+                            </div>
+                        </td>
+                        <td data-label="Created Date">{{ category.created_at }}</td>
+                        <td data-label="Updated Date">{{ category.updated_at }}</td>
+                        <td data-label="Actions">
+                            <div class="table-actions">
+
+                                <a href="#" class="table-action-btn" aria-label="View" data-admin-action="view"
+                                    data-admin-module="category"><i class="fa-solid fa-eye" aria-hidden="true"></i></a>
+
+                                {% if perms.lore.change_categorymodel %}
+                                <a href="#" class="table-action-btn" aria-label="Edit" data-admin-action="edit"
+                                    data-admin-module="category"><i class="fa-solid fa-pen" aria-hidden="true"></i></a>
+                                {% endif %}
+
+                                {% if perms.lore.delete_categorymodel %}
+                                <a href="{% url 'category_delete' category.id %}"
+                                    class="table-action-btn table-action-btn--danger" data-delete-trigger
+                                    data-delete-name="{{ category.name }}" data-delete-id="{{ category.id }}"
+                                    aria-label="Delete {{ category.name }}"><i class="fa-solid fa-trash" aria-hidden="true"></i>
+                                </a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4">No Category found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+
+{% endblock body %}
+
+{% block form %}
+
+<div class="admin-modal" id="categoryModal" data-admin-modal data-admin-module="category" aria-hidden="true">
+    <div class="admin-modal-backdrop" data-modal-close></div>
+    <section class="admin-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="categoryModalTitle">
+        <div class="admin-modal-header">
+            <div><span class="admin-modal-kicker">Car Category Managing Form</span>
+                <h2 class="admin-modal-title" id="categoryModalTitle" data-modal-title>Add New Category</h2>
+                <p class="admin-modal-subtitle" data-modal-subtitle>Enter the details below to add a new category.
+                </p>
+            </div>
+            <button type="button" class="admin-modal-close" data-modal-close aria-label="Close category form"><i
+                    class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+        </div>
+        <form method="post" action="{% url 'category_create' %}" data-create-url="{% url 'category_create' %}"
+            data-update-base-url="{% url 'category_update' '00000000-0000-0000-0000-000000000000' %}"
+            enctype="multipart/form-data" id="categoryForm" class="admin-modal-form" data-modal-form novalidate>
+            {% csrf_token %}
+            <div class="admin-modal-body">
+                <div class="admin-form-grid">
+                    <div class="admin-field">
+                        <label>Name</label>
+                        <input type="text" id="categoryName" name="name" required placeholder="e.g. Sedan">
+
+                    </div>
+                    <div class="admin-field">
+                        <label>Image</label>
+                        <div class="admin-image-upload">
+                            <input type="file" id="categoryImage" name="image" accept="image/webp" data-image-input
+                                data-preview-target="categoryImagePreview">
+                            <label class="admin-upload-control" for="categoryImage">
+                                <span class="admin-upload-icon"><i class="fa-solid fa-cloud-arrow-up"
+                                        aria-hidden="true"></i></span>
+                                <span class="admin-upload-copy"><strong>Category image</strong><small
+                                        data-upload-label>Choose image</small></span>
+                            </label>
+                            <div class="admin-single-preview" id="categoryImagePreview" data-single-preview hidden>
+                                <img src="" alt="Category image preview" data-single-preview-image>
+                                <div class="admin-single-preview-copy"><strong data-preview-name>No image
+                                        selected</strong><small>Preview only</small></div>
+                                <button type="button" class="admin-image-clear" data-clear-single
+                                    data-input-id="categoryImage" aria-label="Remove selected category image"><i
+                                        class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="admin-modal-footer"><span class="admin-modal-disclaimer text-danger">Please double-check your details before
+                    submitting. Any mistakes may affect data accuracy and will be considered a performance issue.</span>
+                <div class="admin-modal-actions">
+                    <button type="button" class="ag-btn ag-btn-secondary" data-modal-close>Cancel</button>
+                    <button type="submit" class="ag-btn ag-btn-primary" data-submit-button>Create Category</button>
+                </div>
+            </div>
+        </form>
+    </section>
+</div>
+
+{% endblock form %}

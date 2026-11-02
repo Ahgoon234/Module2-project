@@ -1,0 +1,134 @@
+{% extends 'website/components/base.html' %}
+
+{% load static %}
+{% load humanize %}
+
+{% block body %}
+
+<!-- Breadcrumb area start -->
+<!-- rts breadcrumb area start -->
+<div class="rts-breadcrumb-area service jarallax">
+    <div class="container">
+        <div class="breadcrumb-area-wrapper">
+            <h1 class="title">Cart</h1>
+            <div class="nav-bread-crumb">
+                <a href="{% url 'home' %}">Home</a>
+                <a href="#" class="current">Cart</a>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- rts breadcrumb area end -->
+<!-- Breadcrumb area end -->
+<main class="ms-main">
+    <div class="ms-page-content">
+        <!--================= Cart Area Start =================-->
+        <article id="post-283" class="post-283 page type-page status-publish hentry">
+            <div class="ms-default-page container">
+                <div class="woocommerce">
+                    <div class="woocommerce-notices-wrapper"></div>
+                    <div class="ms-woocommerce-cart-form-wrapper">
+                        <table class="shop_table shop_table_responsive cart woocommerce-cart-form__contents">
+                            <thead>
+                                <tr>
+                                    <th class="product-remove">&nbsp;</th>
+                                    <th class="product-thumbnail">&nbsp;</th>
+                                    <th class="product-name">Product</th>
+                                    <th class="product-price">Price</th>
+                                    <th class="product-quantity">Quantity</th>
+                                    <th class="product-subtotal">Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in cart_items %}
+                                <tr class="woocommerce-cart-form__cart-item cart_item">
+                                    <td class="product-remove">
+                                        <form action="{% url 'remove_from_cart' item.id %}" method="post" class="remove" aria-label="Remove {{ item.sparepart.name }} from the cart">
+                                            {% csrf_token %}
+                                            <button type="submit" name="submit" style="border: none;">
+                                                <svg viewBox="0 0 200 200" width="18" xmlns="http://www.w3.org/2000/svg">
+                                                    <path
+                                                        d="M114,100l49-49a9.9,9.9,0,0,0-14-14L100,86,51,37A9.9,9.9,0,0,0,37,51l49,49L37,149a9.9,9.9,0,0,0,14,14l49-49,49,49a9.9,9.9,0,0,0,14-14Z">
+                                                    </path>
+                                                </svg>
+                                            </button>
+                                        </form>
+                                    </td>
+                                    <td class="product-thumbnail">
+                                        <a href="{% url 'sparepart_detail' item.sparepart.id %}">
+                                            <img src="{{ item.sparepart.thumbnail.url }}" class="attachment-woocommerce_thumbnail size-woocommerce_thumbnail" alt="{{ item.sparepart.name }}">
+                                        </a>
+                                    </td>
+                                    <td class="product-name" data-title="Product">
+                                        <a href="{% url 'sparepart_detail' item.sparepart.id %}">{{ item.sparepart.name }}</a>
+                                    </td>
+
+                                    <td class="product-price" data-title="Price">
+                                        <span class="woocommerce-Price-amount amount">
+                                            <bdi><span class="woocommerce-Price-currencySymbol">$</span>{{ item.sparepart.price|floatformat:2|intcomma }}</bdi>
+                                        </span>
+                                    </td>
+                                    <td class="product-quantity" data-title="Quantity">
+                                        <div class="cart-edit">
+                                            <div class="quantity-edit">
+                                                <input type="text" class="input" value="{{ item.quantity }}" data-stock="{{ item.sparepart.stock }}" readonly>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="product-subtotal" data-title="Subtotal">
+                                        <span class="woocommerce-Price-amount amount">
+                                            <bdi><span class="woocommerce-Price-currencySymbol">$</span>{{ item.subtotal|floatformat:2|intcomma }}</bdi>
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        <div class="row">
+                            <div class="col-md-5 offset-md-7">
+                                <div class="ms-cart-collaterals cart-collaterals">
+                                    <div class="ms-cart-totals cart_totals ">
+                                        <h3>Cart totals</h3>
+                                        <table class="shop_table shop_table_responsive">
+                                            <tbody>
+                                                <tr class="cart-subtotal">
+                                                    <th>Subtotal</th>
+                                                    <td data-title="Subtotal">
+                                                        <span class="woocommerce-Price-amount amount">
+                                                            <bdi>
+                                                                <span class="woocommerce-Price-currencySymbol">$</span>{{ total|floatformat:2|intcomma }}
+                                                            </bdi>
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                                <tr class="order-total">
+                                                    <th>Total</th>
+                                                    <td data-title="Total">
+                                                        <strong>
+                                                            <span class="woocommerce-Price-amount amount">
+                                                                <bdi>
+                                                                    <span class="woocommerce-Price-currencySymbol">$</span>{{ total|floatformat:2|intcomma }}
+                                                                </bdi>
+                                                            </span>
+                                                        </strong>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <div class="ms-proceed-to-checkout wc-proceed-to-checkout">
+                                            <a href="{% url 'orders' %}" class="rts-btn btn-primary"> Proceed to Order </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </article>
+        <!--================= Cart Area End =================-->
+    </div>
+</main>
+
+{% endblock body %}

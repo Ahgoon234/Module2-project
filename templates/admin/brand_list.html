@@ -1,0 +1,153 @@
+{% extends 'admin/components/base.html' %}
+
+{% load static %}
+{% load humanize %}
+
+{% block body %}
+
+<main class="admin-content" id="adminContent">
+    <section class="dashboard-card dashboard-card--table">
+        <div class="dashboard-card-header">
+            <h3 class="dashboard-card-title">All Brands</h3>
+            {% if perms.lore.add_brandmodel %}
+            <a href="#" class="quick-action-btn" data-admin-action="create" data-admin-module="brand">
+                <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                Add Brand
+                <i class="fa-solid fa-tags" aria-hidden="true"></i>
+            </a>
+            {% endif %}
+        </div>
+        
+        <!-- Search Form -->
+        <form method="get" action="{% url 'brand_list' %}" class="car-filter-search">
+
+            <input type="search" name="search" placeholder="Search brand title..." value="{{ request.GET.search|default:'' }}">
+
+            <button type="submit" class="car-filter-submit">
+                <i class="fas fa-search"></i> Search
+            </button>
+            {% if request.GET.search %}
+            <a href="{% url 'brand_list' %}" class="car-filter-clear">
+                Clear
+            </a>
+            {% endif %}
+        </form>
+        
+
+        <div class="table-responsive">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Brand</th>
+                        <th>Created Date</th>
+                        <th>Updated Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for brand in brands %}
+                    <tr data-brand-id="{{ brand.id }}">
+                        <td data-label="Brand">
+                            <div class="table-car">
+                                {% if brand.logo %}
+                                <img src="{{ brand.logo.url }}" alt="{{ brand.title }}" class="brand_img">
+                                {% endif %}
+
+                                {{ brand.title }}
+                            </div>
+                        </td>
+                        <td data-label="Created Date">{{ brand.created_at|naturaltime }}</td>
+                        <td data-label="Updated Date">{{ brand.updated_at|naturaltime }}</td>
+                        <td data-label="Actions">
+                            <div class="table-actions">
+                                <a href="#" class="table-action-btn" aria-label="View" data-admin-action="view"
+                                    data-admin-module="brand"><i class="fa-solid fa-eye" aria-hidden="true"></i></a>
+
+                                {% if perms.lore.change_brandmodel %}
+                                <a href="#" class="table-action-btn" aria-label="Edit" data-admin-action="edit"
+                                    data-admin-module="brand"><i class="fa-solid fa-pen" aria-hidden="true"></i></a>
+                                {% endif %}
+
+                                {% if perms.lore.delete_brandmodel %}
+                                <a href="{% url 'brand_delete' brand.id %}"
+                                    class="table-action-btn table-action-btn--danger" data-delete-trigger
+                                    data-delete-name="{{ brand.title }}" data-delete-id="{{ brand.id }}" aria-label="Delete {{ brand.title }}">
+                                    <i class="fa-solid fa-trash" aria-hidden="true"></i></a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4">No brand found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+
+{% endblock body %}
+
+{% block form %}
+
+<div class="admin-modal" id="brandModal" data-admin-modal data-admin-module="brand" aria-hidden="true">
+    <div class="admin-modal-backdrop" data-modal-close></div>
+    <section class="admin-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="brandModalTitle">
+        <div class="admin-modal-header">
+            <div><span class="admin-modal-kicker">Brands Managing Form</span>
+                <h2 class="admin-modal-title" id="brandModalTitle" data-modal-title>Add New Brand</h2>
+                <p class="admin-modal-subtitle" data-modal-subtitle>Enter the details below to add a new brand.</p>
+            </div>
+            <button type="button" class="admin-modal-close" data-modal-close aria-label="Close brand form"><i
+                    class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+        </div>
+        <form method="post" action="{% url 'brand_create' %}" data-create-url="{% url 'brand_create' %}"
+            data-update-base-url="{% url 'brand_update' '00000000-0000-0000-0000-000000000000' %}"
+            enctype="multipart/form-data" id="brandForm" class="admin-modal-form" data-modal-form novalidate>
+            {% csrf_token %}
+            <input type="hidden" name="brand_id" id="brandId">
+            <div class="admin-modal-body">
+                <div class="admin-form-grid">
+                    <div class="admin-field">
+                        <label>Title</label>
+                        <input type="text" id="brandTitle" name="title" required placeholder="e.g. Toyota">
+
+                    </div>
+                    <div class="admin-field">
+                        <label>Logo</label>
+                        <div class="admin-image-upload">
+                            <input type="file" id="brandLogo" name="logo" accept="image/webp" data-image-input
+                                data-preview-target="brandLogoPreview">
+                            <label class="admin-upload-control" for="brandLogo">
+                                <span class="admin-upload-icon"><i class="fa-solid fa-cloud-arrow-up"
+                                        aria-hidden="true"></i></span>
+                                <span class="admin-upload-copy"><strong>Brand logo</strong><small
+                                        data-upload-label>Choose image</small></span>
+                            </label>
+                            <div class="admin-single-preview" id="brandLogoPreview" data-single-preview hidden>
+                                <img src="" alt="Brand logo preview" data-single-preview-image>
+                                <div class="admin-single-preview-copy"><strong data-preview-name>No image
+                                        selected</strong><small>Preview only</small></div>
+                                <button type="button" class="admin-image-clear" data-clear-single
+                                    data-input-id="brandLogo" aria-label="Remove selected brand logo"><i
+                                        class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="admin-modal-footer"><span class="admin-modal-disclaimer text-danger">Please double-check your details before
+                    submitting. Any mistakes may affect data accuracy and will be considered a performance issue.</span>
+                <div class="admin-modal-actions">
+                    <button type="button" class="ag-btn ag-btn-secondary" data-modal-close>Cancel</button>
+                    <button type="submit" class="ag-btn ag-btn-primary" data-submit-button>Create Brand</button>
+                </div>
+            </div>
+        </form>
+    </section>
+</div>
+
+{% endblock form %}
